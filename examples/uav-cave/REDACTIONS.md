@@ -6,7 +6,8 @@ The artifacts in `se/` are the v2 run's files, unchanged except for these rules:
    `x ⟨…⟩`. The entrance and the approach route are included, so one rule covers everything.
    Distances, timings and counts are unchanged.
 2. References to evidence that is not published are marked "(not published)".
-3. Local paths and course-owned material are not included.
+3. Local paths, simulator file names and other course-owned references are replaced by
+   `⟨redacted⟩`.
 
 Not published: E-05, E-10, E-19, and every other file derived from the simulator's scene files. They hold the
 lanterns' reference positions and the cave geometry, which the test harness used only to score
