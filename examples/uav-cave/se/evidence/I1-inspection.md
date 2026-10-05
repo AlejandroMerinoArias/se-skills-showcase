@@ -10,7 +10,7 @@ pass (16/16 simulation tests each); last run `build_results/runs/20260928-221006
 | Check | Command | Result |
 |---|---|---|
 | Unity binary and data | `git diff --stat 43f40e9 HEAD -- ros2_ws/src/unity_sim` | 0 lines (unchanged since the course scaffold) |
-| Unity launcher blob | `git hash-object ros2_ws/src/unity_sim/Simulation.x86_64` vs `git rev-parse 43f40e9:…` | identical `55eade3c…` |
+| Unity launcher blob | `git hash-object ros2_ws/src/unity_sim/⟨redacted⟩` vs `git rev-parse 43f40e9:…` | identical `55eade3c…` |
 | Corruptor source | `git hash-object …/state_estimate_corruptor_node.cpp` vs first commit `ce7f29a` | identical `610ee0be…` |
 | Bridge sources and launch files | `git diff --stat ce7f29a HEAD -- ros2_ws/src/simulation/src ros2_ws/src/simulation/launch` | 0 lines |
 | Controller | `git diff --stat 43f40e9 HEAD -- ros2_ws/src/controller_pkg` | 0 lines |

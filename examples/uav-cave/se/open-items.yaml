@@ -94,7 +94,7 @@ items:
   evidence: evidence/E-05.md (not published)
 - id: E-06
   kind: experiment
-  text: Can reference cave geometry be obtained (scene data in Simulation_Data, or a truth-pose mapping run used
+  text: Can reference cave geometry be obtained (scene data in ⟨redacted⟩, or a truth-pose mapping run used
     only for scoring) to judge map coverage for SYS-P-004? Also measure the narrowest passage width and the depth
     camera range and field of view (these back SYS-P-003 and the 5 m band in SYS-P-004).
   blocks:

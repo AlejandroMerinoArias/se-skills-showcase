@@ -28,7 +28,7 @@ the entrance to being back with all four lanterns reported.
 
 ## Environment
 
-- Unity simulation binary (`ros2_ws/src/unity_sim/Simulation.x86_64`): a wide open area with the
+- Unity simulation binary (`ros2_ws/src/unity_sim/⟨redacted⟩`): a wide open area with the
   UAV start point and a cave somewhere in the map. The binary, the cave and the state-estimate
   corruption must not be changed.
 - Development and test host: Windows 11 + WSL2 Ubuntu 24.04, ROS 2 Jazzy, workspace `~/ws_k7`; Unity must render on the GPU (`GALLIUM_DRIVER=d3d12`).
