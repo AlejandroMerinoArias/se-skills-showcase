@@ -1,9 +1,11 @@
 # How it works
 
-se-skills is eight Claude Code skills ([plugin/skills](../plugin/skills/)) and a set of Python
-scripts ([plugin/scripts](../plugin/scripts/)). The skills tell the agent how to do each phase; the
-scripts check the artifacts and compute where the project is. All state lives in a project's `se/`
-folder, so a fresh agent, a crash or a new session resumes by asking the router where things stand.
+se-skills is eight Claude Code skills ([plugin/skills](../plugin/skills/)), instruction files the
+agent loads when a task matches them, and a set of Python scripts
+([plugin/scripts](../plugin/scripts/)). The skills say how to do each phase; the scripts check the
+artifacts and compute where the project is. All state lives in a project's `se/` folder, so a
+fresh agent, a crash or a new session resumes by asking the router (the `se-develop` skill, which
+reads the computed state and starts the next phase) where things stand.
 Every excerpt below is quoted from the UAV case study in [examples/uav-cave/se](../examples/uav-cave/se/).
 
 ## The route
@@ -23,8 +25,8 @@ flowchart TD
     C -.->|revised decision and requirements| D
 ```
 
-The router (`se-develop`) runs `se_check.py --route`, which prints one of sixteen states, and
-dispatches the skill that owns it. It does no phase work itself.
+The router runs `se_check.py --route`, which prints one of sixteen states, and dispatches the
+skill that owns it.
 
 ## Tailoring and modes
 
@@ -167,9 +169,9 @@ evidence and the customer approval:
 
 `se-build` does not write code itself. It wraps the superpowers plugin's `writing-plans` and
 `subagent-driven-development` skills and adds four things: a scope gate (nothing with an open item
-enters a plan), requirement IDs on every plan task, `VERIFIES:` on every test, and model and review
-rigour set by criticality. Implementation problems become problem reports, never silent edits to
-requirement text.
+enters a plan), the trace (requirement IDs on plan tasks and `VERIFIES:` on tests), criticality
+rules (model and review rigour by level), and problem reports: implementation problems are
+reported, never silently edited into requirement text.
 
 ## Enforced by scripts versus guided by skill text
 

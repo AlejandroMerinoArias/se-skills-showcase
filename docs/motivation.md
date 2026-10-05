@@ -27,8 +27,10 @@ Systems engineering is the discipline aerospace uses to keep large, long project
 parts that matter here are standard material in any systems-engineering course:
 
 - **Requirements with acceptance criteria.** Each requirement is a single, verifiable statement
-  with an identifier, written to the INCOSE quality criteria (necessary, unambiguous, verifiable,
-  singular, and so on) and, here, in EARS form ("When ..., the system shall ..."). Each one also
+  with an identifier, written to the quality criteria of INCOSE (the International Council on Systems
+  Engineering): necessary, unambiguous, verifiable, singular, and so on. Here it is also written in
+  EARS form (Easy Approach to Requirements Syntax), a small set of sentence templates such as
+  "When ..., the system shall ...". Each one also
   carries a criticality level that sets how much review it gets.
 - **Verification methods.** Every requirement states how it will be shown to be met: test,
   analysis, inspection or demonstration. "Done" then has a definition other than "the code runs".
@@ -79,9 +81,11 @@ hands the decision to the user.
 
 ## What this repository tries to show
 
-The repository presents se-skills, a set of Claude Code skills and helper scripts that implement
+The repository presents se-skills, a set of Claude Code skills (instruction files that Claude
+Code, Anthropic's coding agent, loads when a task matches them) and helper scripts that implement
 the adapted method, and one case study in which the method carried an autonomous UAV mission in a
-simulated cave from a one-page brief to a verified delivery. It is an experimental proof of concept,
+simulated cave from a one-page brief to a delivery that passed its final validation and met the
+customer's acceptance rule of 2 successful simulator runs out of 3. It is an experimental proof of concept,
 not a supported tool: there is one case study, no baseline run of the same brief without the
 method, and the author of the method was also the customer. Those limits are set out in
 [limitations.md](limitations.md).

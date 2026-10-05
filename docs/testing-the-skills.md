@@ -19,10 +19,11 @@ before they can be countered.
 Each v2 skill was developed with a pressure-test method adapted from the superpowers plugin's own
 guidance for writing skills.
 
-1. **Write the scenario.** A short task, set in a small fixture project, designed to provoke one
+1. **Write the scenario.** A short task, set in a fixture project (a small throwaway project
+   prepared for the test), designed to provoke one
    specific failure, for example a review that has already used its two rounds and a user asking
    for a third.
-2. **RED.** A fresh subagent receives the scenario with no skill and no mention of systems
+2. **RED.** A subagent (a fresh agent instance started for one task) receives the scenario with no skill and no mention of systems
    engineering. Its answer is recorded verbatim, including the arguments it gives.
 3. **Check the control.** If the baseline agent does not show the failure, there is nothing to fix:
    the scenario is dropped and the skill gets no rule for it. Writing guidance against a failure

@@ -22,8 +22,14 @@ same session budget to a second run that uses only the general-purpose superpowe
 (brainstorming, planning, subagent-driven development) and no systems-engineering layer. The two
 runs would then be compared on mission success over three consecutive simulator runs, on defects
 caught before the simulator against defects found in it, on rework, on cost by model tier, and on
-the number of questions put to the customer, with the sealed reference solution as a secondary
-judge of requirement coverage.
+the number of questions put to the customer, with a reference set of requirements, extracted from
+the earlier solution and the course specification and sealed before the runs, as a secondary judge
+of requirement coverage.
+
+The v2 run's own acceptance rule, set by the customer, was 2 successful runs out of 3; acceptance
+series 3 met it with runs 2 and 3
+([evidence/I5-acceptance-3.md](../examples/uav-cave/se/evidence/I5-acceptance-3.md), Verdict).
+Three consecutive successes, the planned comparison's first metric, has not been checked on v2.
 
 The baseline is postponed. When it runs, it will run on newer versions of the agent and its
 plugins than the v2 run did, and the comparison will have to state that. Until then, v1 is shown
