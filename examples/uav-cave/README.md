@@ -34,8 +34,8 @@ Read `se/` in this order:
    would give away the course challenge's answers is marked "(not published)" where it is cited.
 7. **[generated/matrix.md](se/generated/matrix.md)** — the full requirement-to-verification matrix,
    generated from `requirements.yaml`: every requirement with its increment, criticality, method
-   and result (`PASS`, `EVIDENCE` or `NESTED`). This is the traceability closure the other files
-   build toward.
+   and result (`PASS`, `EVIDENCE`, `NESTED`, or `UNVERIFIED` for two retired requirements). This is
+   the traceability closure the other files build toward.
 
 Two smaller files are worth a glance after the above: `se/se-config.yaml` (the run's tailoring —
 full mode, which model handled which criticality, the review and question budgets) and
