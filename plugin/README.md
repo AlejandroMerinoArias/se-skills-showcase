@@ -4,14 +4,13 @@
 
 Systems Engineering skill set for Claude Code: formal requirements, full
 bidirectional traceability, and criticality-driven verification. This repo
-provides a deterministic Python foundation (two CLIs plus their pytest
-suite) and the full V-model pipeline of skills that call out to it. See
-`docs/specs/2026-07-25-se-skills-design.md` for the full design.
+provides a deterministic Python foundation (two CLIs, `se_check.py` and `se_trace.py`, on four shared modules, plus
+their pytest suite) and the full V-model pipeline of skills that call out to it. The design is described in the repository's docs/how-it-works.md.
 
 ## Setup
 
 ```bash
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
 ```
 
 Requires Python 3.11+.
@@ -244,7 +243,7 @@ python -m pytest scripts/tests -v
 
 ## v2 additions (0.4.0)
 
-Install the one new dependency: `pip install -r requirements-dev.txt` (adds `ruamel.yaml`,
+Install the one new dependency: `pip install -r requirements.txt` (named `requirements-dev.txt` in the development repository; adds `ruamel.yaml`,
 which every write now uses so that comments in `requirements.yaml` survive).
 
 New files under `se/`, both optional:

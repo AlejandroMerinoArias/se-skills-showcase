@@ -14,8 +14,8 @@ Signed off by the customer on 2026-09-29 (I3 verification gate).
 
 ```
 id,x,y,z
-0,-598.818,-8.484,4.533
-1,-1044.103,-157.374,-37.184
+0,⟨x, y, z⟩
+1,⟨x, y, z⟩
 ```
 
 The file has one header line, then one line per reported lantern: id, then x, y, z in metres with three

@@ -367,12 +367,12 @@ items:
   text: Is the tunnel system holding Lantern, Lantern (1) and Lantern (2) connected to the gallery by a passage
     a UAV can fly (at least 2 m clearance), and where? The reference surfaces alone show no inside connection even
     at 1 m clearance (E-10 (not published) route probe); parts of the shell are closed only by the Unity terrain, which covers x
-    from -500 m eastwards.
+    from ⟨…⟩ m eastwards.
   blocks:
   - SYS-P-005
   owner: I4
   status: closed
-  answer: Connected via (-698,-60) (11/18 runs); current exploration does not reach Lantern (2) or Lantern in 30
+  answer: Connected via (⟨…⟩) (11/18 runs); current exploration does not reach Lantern (2) or Lantern in 30
     min (heads west, dithers in the far corner; Lantern 45-60 m deeper than flown); a southern branch near the mouth
     leads out of the cave (3/18). I4 must change the exploration strategy.
   evidence: evidence/E-18.md
@@ -571,7 +571,7 @@ items:
 - id: E-27
   kind: experiment
   text: With descents weighted 1 instead of 3 in the explorer ranking (climbs stay 3), does a 30 min run reach the
-    tunnel east of the western junction (z about -30) and Lantern, and does it keep clear of the problems D-24 fixed
+    tunnel east of the western junction (z about ⟨…⟩) and Lantern, and does it keep clear of the problems D-24 fixed
     (no climbing out, SYS-S-001)? Evidence for a proposed change to ITEM-D-031 (customer-approved, CRIT-A).
   blocks:
   - ITEM-D-031
