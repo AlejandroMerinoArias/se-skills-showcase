@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="full_project" tests="2" failures="0">
+  <testcase classname="tests.test_hover" name="test_hover_command_latency_under_obstacle" time="0.01"/>
+  <testcase classname="tests.ControllerNode" name="ControllerNode.ReactiveStopTriggersUnder2m" time="0.02"/>
+</testsuite>

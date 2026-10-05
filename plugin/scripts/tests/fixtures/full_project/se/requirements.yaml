@@ -1,0 +1,59 @@
+meta:
+  project: shelf-robot-demo
+  mode: full
+  levels: [SYS, ITEM]
+
+requirements:
+  - id: SYS-F-001
+    text: "When the depth camera detects an obstacle within 2 m, the controller shall command a hover state within 200 ms."
+    category: functional
+    criticality: A
+    rationale: null
+    source: customer
+    parent: null
+    allocated_to: null
+    moc: test
+    verified_by: []
+    status: draft
+    waiver: null
+    suspect: false
+    target: null
+    threshold: null
+    history:
+      - {date: 2026-07-25, change: created, why: "initial capture"}
+
+  - id: ITEM-D-002
+    text: "The controller shall trigger a reactive stop when range < 2.0 m, derived from sensor latency and vehicle stopping distance analysis."
+    category: derived
+    criticality: A
+    rationale: "Sensor latency (80 ms) plus vehicle stopping distance at max speed requires a 2 m trigger margin."
+    source: null
+    parent: SYS-F-001
+    allocated_to: controller_pkg
+    moc: test
+    verified_by: []
+    status: draft
+    waiver: null
+    suspect: false
+    target: null
+    threshold: null
+    history:
+      - {date: 2026-07-25, change: created, why: "architecture decision"}
+
+  - id: ITEM-S-003
+    text: "The controller software shall be verified free of unintended reactive-stop oscillation."
+    category: safety
+    criticality: A
+    rationale: null
+    source: null
+    parent: SYS-F-001
+    allocated_to: controller_pkg
+    moc: analysis
+    verified_by: ["evidence/depth_camera_analysis.md"]
+    status: verified
+    waiver: null
+    suspect: false
+    target: null
+    threshold: null
+    history:
+      - {date: 2026-07-25, change: created, why: "safety analysis requirement"}

@@ -1,0 +1,8 @@
+{
+  "name": "se-skills",
+  "version": "0.5.0",
+  "description": "Systems Engineering skill set for Claude Code: formal requirements, open-items triage, incremental delivery with per-increment verification, and change management, over deterministic Python checks.",
+  "author": {
+    "name": "Alejandro Merino Arias"
+  }
+}

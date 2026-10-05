@@ -1,0 +1,41 @@
+meta:
+  project: demo-project
+  mode: full
+  levels: [SYS, ITEM]
+
+requirements:
+  - id: SYS-F-001
+    text: "When the system starts, the system shall enter standby mode within 1 s."
+    category: functional
+    criticality: B
+    rationale: null
+    source: customer
+    parent: null
+    allocated_to: null
+    moc: test
+    verified_by: []
+    status: draft
+    waiver: null
+    suspect: false
+    target: null
+    threshold: null
+    history:
+      - {date: 2026-07-25, change: created, why: "initial capture"}
+
+  - id: ITEM-F-002
+    text: "When standby mode is active, the controller shall poll sensors every 50 ms."
+    category: functional
+    criticality: B
+    rationale: null
+    source: null
+    parent: null
+    allocated_to: controller_pkg
+    moc: test
+    verified_by: []
+    status: draft
+    waiver: null
+    suspect: false
+    target: null
+    threshold: null
+    history:
+      - {date: 2026-07-25, change: created, why: "initial capture"}

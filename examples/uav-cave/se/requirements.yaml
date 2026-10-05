@@ -1,0 +1,2167 @@
+meta:
+  project: uav-cave-mission
+  mode: full
+  levels:
+  - SYS
+  - ITEM
+requirements:
+- id: SYS-F-001
+  text: When the mission starts, the UAV system shall fly the UAV along a predefined waypoint route from the start point to the cave entrance point.
+  category: functional
+  criticality: A
+  rationale: 'Success criterion 1: the UAV arrives at the cave entrance. Predefined waypoints are allowed only up to the entrance.'
+  source: BRIEF.md 1, 4.2, 4.4, 5.1
+  parent: null
+  allocated_to:
+  - cave_mission
+  - cave_planning
+  moc: test
+  verified_by: []
+  status: implemented
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-F-002
+  text: When the UAV first comes within 1.0 m of the cave entrance point, the UAV system shall publish an entrance-reached event carrying the simulation timestamp.
+  category: functional
+  criticality: A
+  rationale: The 30-minute clock starts at this instant, so it must be observable. 1.0 m is a proposed arrival tolerance.
+  source: BRIEF.md 4.4, 5.5
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i1_mission.py::test_entrance_event_published_once_when_uav_at_entrance
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-F-003
+  text: When the UAV first comes within 1.0 m of the cave entrance point, the UAV system shall write a log line containing the simulation timestamp of that instant.
+  category: functional
+  criticality: B
+  rationale: Brief allows publish or log; the log survives a crashed run and is what the scorer reads.
+  source: BRIEF.md 4.4
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_append_event_writes_extra_values
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_append_event_writes_name_and_time
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_try_append_event_reports_failure_instead_of_raising
+  - tools/sim_tests/test_i1_mission.py::test_entrance_instant_is_logged_with_its_timestamp
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-F-004
+  text: While the UAV is inside the cave, the UAV system shall detect lanterns in the onboard camera data.
+  category: functional
+  criticality: A
+  rationale: Success criterion 2 needs all four lanterns found. The sensor and detection cue are unknown (E-01).
+  source: BRIEF.md 1.1, 5.2
+  parent: null
+  allocated_to:
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i3_lanterns.py::test_lantern_3_in_the_gallery_is_detected_and_reported
+  - tools/sim_tests/test_i3_lanterns.py::test_lantern_file_lists_the_published_lanterns
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: SYS-F-005
+  text: The UAV system shall report at most one position per physical cave lantern.
+  category: functional
+  criticality: A
+  rationale: 'Duplicate detections of one lantern must not count toward the four (review B1: ''exactly four'' conflicted with failed runs).'
+  source: BRIEF.md 1.1, 5.2
+  parent: null
+  allocated_to:
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_blob_nearer_than_2_m_is_no_observation
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_observation_joins_the_nearest_lantern_within_8_m
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_partial_blob_merges_into_the_same_lantern
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_two_lanterns_drifting_within_15_m_merge_into_the_earlier_reported
+  - tools/sim_tests/test_i3_lanterns.py::test_at_most_one_report_per_physical_lantern_throughout_the_run
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: SYS-F-006
+  text: When four distinct cave lanterns have been reported, the UAV system shall fly the UAV back to within 1.0 m of the cave entrance point.
+  category: functional
+  criticality: A
+  rationale: Success criterion 4. No landing is needed.
+  source: BRIEF.md 5.4
+  parent: null
+  allocated_to:
+  - cave_mission
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_failed_return_plan_is_retried
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_long_return_path_is_not_replanned_before_it_can_be_flown
+  - tools/sim_tests/test_i2_exploration.py::test_uav_flies_back_to_the_entrance_after_four_lanterns
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-F-007
+  text: The UAV system shall build a 3D voxel-grid representation of the cave from point clouds computed from the depth camera images.
+  category: functional
+  criticality: A
+  rationale: 'Success criterion 3 and deliverable 3.1.b: depth image to point cloud to voxel grid (review B8).'
+  source: BRIEF.md 1.2, 3.1.b, 5.3
+  parent: null
+  allocated_to:
+  - cave_perception
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.InsertPointCloudMarksRayFreeAndEndOccupied
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.OccupiedCellSurvivesAFewGrazingMisses
+  - tools/sim_tests/test_i1_mission.py::test_map_contains_cave_geometry_beyond_the_mouth
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-F-008
+  text: While the mission is running, the UAV system shall write the reported lantern positions to a file at least every 10 s.
+  category: functional
+  criticality: A
+  rationale: 'Brief 1.3: the file must exist even if the run fails or a process crashes; periodic writes make that verifiable (review B3).'
+  source: BRIEF.md 1.3
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by: []
+  status: implemented
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-F-009
+  text: While the mission is running, the UAV system shall write the cave representation to a file at least every 30 s.
+  category: functional
+  criticality: A
+  rationale: 'Brief 1.3: the file must exist even if the run fails or a process crashes; periodic writes make that verifiable (review B3).'
+  source: BRIEF.md 1.3
+  parent: null
+  allocated_to:
+  - cave_perception
+  moc: test
+  verified_by: []
+  status: implemented
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-F-010
+  text: While the mission is running, the UAV system shall publish the current lantern position estimates on a ROS topic.
+  category: functional
+  criticality: C
+  rationale: Lets the operator watch progress live (e.g. in RViz); the file (SYS-F-008) is the formal output.
+  source: BRIEF.md 1.1
+  parent: null
+  allocated_to:
+  - cave_lanterns
+  moc: demonstration
+  verified_by:
+  - evidence/I3-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: SYS-F-011
+  text: While the mission is running, the UAV system shall publish the current cave voxel grid on a ROS topic.
+  category: functional
+  criticality: C
+  rationale: Lets the operator watch mapping progress live; the file (SYS-F-009) is the formal output.
+  source: BRIEF.md 1.2
+  parent: null
+  allocated_to:
+  - cave_perception
+  moc: demonstration
+  verified_by:
+  - evidence/I1-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-F-012
+  text: If 1500 s have elapsed since the entrance-reached event, then the UAV system shall fly the UAV back to within 1.0 m of the cave entrance point.
+  category: functional
+  criticality: B
+  rationale: 'Retired: customer answered Q-01 that an early partial return has no value to them.'
+  source: BRIEF.md 5.5
+  parent: null
+  allocated_to: null
+  moc: test
+  verified_by: []
+  status: retired
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  open_items:
+  - Q-01
+- id: SYS-P-001
+  text: The UAV system shall report each cave lantern position within 2.0 m (Euclidean distance) of the centre of the visible lantern.
+  category: performance
+  criticality: A
+  rationale: 'Success criterion 2; the customer defines true position as the visible lantern centre (Q-06). E-04: estimator error <= 0.02 m, so the budget goes to detection and localisation.'
+  source: BRIEF.md 5.2
+  parent: null
+  allocated_to:
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_estimate_is_median_xy_and_mid_extent_z
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_many_close_partial_views_do_not_evict_the_full_body_views
+  - tools/sim_tests/test_i3_lanterns.py::test_every_reported_lantern_is_within_2_m_of_a_cave_lantern
+  status: verified
+  waiver: null
+  suspect: false
+  target: 1.0
+  threshold: 2.0
+  increment: I3
+- id: SYS-P-002
+  text: The UAV system shall complete the mission, from the entrance-reached event until the UAV is back within 1.0 m of the entrance with four lanterns reported, within 1800 s of simulation time.
+  category: performance
+  criticality: A
+  rationale: Success criterion 5. 'As fast as possible' in 1.1 motivates a 900 s design target.
+  source: BRIEF.md 1.1, 5.5
+  parent: null
+  allocated_to:
+  - cave_navigation
+  - cave_planning
+  - cave_mission
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i4_mission.py::test_four_lanterns_reported_and_back_at_the_entrance_within_1800_s
+  status: verified
+  waiver: null
+  suspect: false
+  target: 900
+  threshold: 1800
+  increment: I5
+- id: SYS-P-003
+  text: The UAV system shall represent the cave with a voxel edge length of at most 0.5 m.
+  category: performance
+  criticality: B
+  rationale: A 0.5 m grid resolves cave passages a quadrotor can fly through; proposed value to be confirmed at the gate.
+  source: BRIEF.md 5.3
+  parent: null
+  allocated_to:
+  - cave_perception
+  moc: inspection
+  verified_by: []
+  status: implemented
+  waiver: null
+  suspect: false
+  target: 0.2
+  threshold: 0.5
+  increment: I1
+- id: SYS-P-004
+  text: The UAV system shall map at least 90 % of the reference cave-wall surface points lying within 5 m of the UAV's flown path inside the cave, where a point counts as mapped if an occupied voxel lies within 0.5 m of it.
+  category: performance
+  criticality: B
+  rationale: Brief 5.3 asks us to judge map quality and say how. Coverage against reference geometry (E-06) is the proposed judgement.
+  source: BRIEF.md 5.3
+  parent: null
+  allocated_to:
+  - cave_perception
+  - cave_navigation
+  moc: analysis
+  verified_by:
+  - evidence/I5-acceptance-3.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: 95
+  threshold: 90
+  increment: I5
+- id: SYS-C-001
+  text: The UAV system shall derive every UAV position it uses for navigation, mapping and lantern localisation from the corrupted state estimate, never from the true pose.
+  category: constraint
+  criticality: A
+  rationale: Imposed constraint. The provided static TF chain attaches cameras to /true_body, which the design must replace.
+  source: BRIEF.md 4.1
+  parent: null
+  allocated_to:
+  - cave_bringup
+  moc: inspection
+  verified_by: []
+  status: implemented
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-C-002
+  text: After the entrance-reached event, the UAV system shall choose every flight goal, except the cave entrance point, from data sensed during the current run.
+  category: constraint
+  criticality: A
+  rationale: 'Imposed constraint: no predefined waypoints and no prior knowledge of the cave or the lanterns inside the cave.'
+  source: BRIEF.md 4.2
+  parent: null
+  allocated_to:
+  - cave_navigation
+  - cave_mission
+  moc: inspection
+  verified_by:
+  - evidence/I2-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-C-003
+  text: The UAV system shall leave the Unity simulation binary, the cave and the state-estimate corruption (code and parameters) unmodified.
+  category: constraint
+  criticality: A
+  rationale: Imposed constraint.
+  source: BRIEF.md 4.3
+  parent: null
+  allocated_to:
+  - cave_bringup
+  - simulation
+  moc: inspection
+  verified_by:
+  - evidence/I1-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-C-004
+  text: The UAV system shall start in full (simulation, bridge, controller and mission stack) from a single ROS 2 launch file.
+  category: constraint
+  criticality: B
+  rationale: Deliverable 3.1.
+  source: BRIEF.md 3.1
+  parent: null
+  allocated_to:
+  - cave_bringup
+  moc: demonstration
+  verified_by: []
+  status: implemented
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-C-005
+  text: The UAV system shall build and run on Ubuntu 24.04 with ROS 2 Jazzy.
+  category: constraint
+  criticality: A
+  rationale: Customer's judging machine runs Ubuntu 24.04 with ROS 2 Jazzy (Q-03); other platforms are out of scope (brief 6.3).
+  source: BRIEF.md 3.1, 6.3
+  parent: null
+  allocated_to:
+  - cave_bringup
+  moc: demonstration
+  verified_by:
+  - evidence/I1-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-C-006
+  text: The UAV system repository shall contain a readme.md with step-by-step installation and launch instructions that names the Ubuntu version used.
+  category: constraint
+  criticality: B
+  rationale: Deliverable 3.1.
+  source: BRIEF.md 3.1
+  parent: null
+  allocated_to:
+  - docs (README.md)
+  moc: inspection
+  verified_by:
+  - evidence/I4-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-C-007
+  text: The UAV system delivery shall include a documentation file that describes every ROS package and node of the system.
+  category: constraint
+  criticality: B
+  rationale: Deliverable 3.2. The brief gives approx. 4-6 pages as a guide, not a limit.
+  source: BRIEF.md 3.2
+  parent: null
+  allocated_to:
+  - docs
+  moc: inspection
+  verified_by:
+  - evidence/I4-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-C-008
+  text: The UAV system documentation shall identify every piece of external code used, with its source.
+  category: constraint
+  criticality: B
+  rationale: Deliverable 3.2.
+  source: BRIEF.md 3.2
+  parent: null
+  allocated_to:
+  - docs
+  moc: inspection
+  verified_by:
+  - evidence/I4-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-C-009
+  text: The UAV system shall contain separate ROS nodes for mission state machine, depth-to-voxel perception, path planning and trajectory planning.
+  category: constraint
+  criticality: B
+  rationale: Deliverable 3.1 a-d names these nodes explicitly.
+  source: BRIEF.md 3.1.a-d
+  parent: null
+  allocated_to:
+  - cave_mission
+  - cave_perception
+  - cave_navigation
+  - cave_planning
+  moc: inspection
+  verified_by:
+  - evidence/I2-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-I-001
+  text: The UAV system shall write lantern positions as x, y, z in metres in the world frame of the state estimate, one line per lantern.
+  category: interface
+  criticality: B
+  rationale: Makes the lantern file readable by the customer and by the scoring tool without extra software.
+  source: BRIEF.md 1.1
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: inspection
+  verified_by:
+  - evidence/I3-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: SYS-I-002
+  text: The UAV system shall write the cave representation in a file format that a freely available viewer can open.
+  category: interface
+  criticality: B
+  rationale: Customer must be able to inspect the map. Format choice is a design decision.
+  source: BRIEF.md 1.2
+  parent: null
+  allocated_to:
+  - cave_perception
+  moc: inspection
+  verified_by: []
+  status: implemented
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-S-001
+  text: The UAV system shall complete the mission without the UAV touching any cave or terrain surface that its depth camera can observe.
+  category: safety
+  criticality: A
+  rationale: 'A collision ends a run. Customer (Q-19): the simulator has solid objects the depth camera never shows (E-19 (not published)); contact with those is judged by SYS-S-004 instead.'
+  source: BRIEF.md 5; CONOPS Environment
+  parent: null
+  allocated_to:
+  - cave_navigation
+  - cave_planning
+  - cave_perception
+  moc: demonstration
+  verified_by:
+  - evidence/I3-inspection.md
+  - evidence/I5-acceptance-3.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: SYS-S-002
+  text: If no state estimate message arrives for 0.5 s, then the UAV system shall stop issuing new flight goals until state estimates resume.
+  category: safety
+  criticality: B
+  rationale: Estimator dropouts are a leading field failure mode in subterranean UAV missions. Planning without a pose is unsafe.
+  source: 'Research: SubT lessons learned, arXiv:2110.04390, arXiv:2404.17759'
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by: []
+  status: implemented
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: SYS-S-003
+  text: If the planner finds no collision-free path to the current goal, then the UAV system shall hold the UAV at its current position and select another goal.
+  category: safety
+  criticality: B
+  rationale: Avoids flying blind into unmapped space when exploration stalls.
+  source: BRIEF.md 4.2; CONOPS use case 3
+  parent: null
+  allocated_to:
+  - cave_navigation
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_flight_timeout_holds_at_the_current_position_and_replans_from_there
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_no_path_published_while_no_exploration_path_is_available
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ACandidateIsSearchedWithinTheCandidateBudget
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.BlacklistsUnreachableGoalAndSelectsTheNextBest
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.NoPathThroughSolidWall
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-F-013
+  parent: null
+  allocated_to:
+  - cave_lanterns
+  verified_by:
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_lantern_before_the_entrance_plane_is_never_reported
+  - tools/sim_tests/test_i3_lanterns.py::test_the_start_lantern_is_never_reported
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  text: The UAV system shall exclude the reference lantern at the start point from the reported cave lanterns.
+  category: functional
+  criticality: A
+  rationale: 'Customer confirmed (Q-02): only the four cave lanterns are reported; the start lantern is for reference.'
+  source: BRIEF.md 1.1
+  moc: test
+  open_items:
+  - Q-02
+  increment: I3
+- id: SYS-F-014
+  parent: null
+  allocated_to:
+  - cave_mission
+  verified_by:
+  - tools/sim_tests/test_i1_mission.py::test_final_lantern_file_written_after_sigint
+  - tools/sim_tests/test_i1_mission.py::test_lantern_file_written_at_mission_completion
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  text: When the run ends by mission completion or by operator shutdown (SIGINT), the UAV system shall write the final lantern positions to the lantern file.
+  category: functional
+  criticality: A
+  rationale: Final state must be on disk at every orderly end (brief 1.3, review B3).
+  source: BRIEF.md 1.3
+  moc: test
+  increment: I1
+- id: SYS-F-015
+  parent: null
+  allocated_to:
+  - cave_perception
+  verified_by:
+  - tools/sim_tests/test_i1_mission.py::test_final_map_files_written_after_sigint
+  - tools/sim_tests/test_i1_mission.py::test_map_files_written_at_mission_completion
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  text: When the run ends by mission completion or by operator shutdown (SIGINT), the UAV system shall write the final cave representation to the map file.
+  category: functional
+  criticality: A
+  rationale: Final state must be on disk at every orderly end (brief 1.3, review B3).
+  source: BRIEF.md 1.3
+  moc: test
+  increment: I1
+- id: SYS-C-010
+  parent: null
+  allocated_to:
+  - docs
+  verified_by:
+  - evidence/I4-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  text: The UAV system documentation shall state the method and the result of the cave-map quality judgement.
+  category: constraint
+  criticality: B
+  rationale: 'Brief 5.3: the customer cannot measure map accuracy and asks to be told how it was judged (review B7).'
+  source: BRIEF.md 5.3
+  moc: inspection
+  increment: I4
+- id: SYS-P-005
+  text: The UAV system shall meet all five success criteria of brief section 5 in at least 2 of 3 consecutive simulation runs.
+  category: performance
+  criticality: A
+  rationale: 'Customer acceptance criterion (Q-04: 2 of 3). Target is 3 of 3.'
+  source: BRIEF.md 5; customer answer Q-04
+  parent: null
+  allocated_to:
+  - cave_bringup
+  moc: demonstration
+  verified_by:
+  - evidence/I5-acceptance-3.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: 3
+  threshold: 2
+  increment: I5
+- id: ITEM-D-001
+  text: The bringup shall publish the camera extrinsics as static transforms from the frame 'body' to each camera frame, and shall not start any transform publisher whose parent is a true-state frame.
+  category: derived
+  criticality: A
+  rationale: 'D-04: cameras must hang from the estimated body pose; the provided chain hangs them from /true_body.'
+  source: null
+  parent: SYS-C-001
+  allocated_to:
+  - cave_bringup
+  moc: inspection
+  verified_by:
+  - evidence/I1-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-002
+  text: When the mission starts, the mission node shall command the path ⟨x, y, z⟩, ⟨x, y, z⟩, ⟨x, y, z⟩ m in frame 'world'.
+  category: derived
+  criticality: B
+  rationale: 'D-05: route and entrance point flown 9/9 without contact (evidence/E-03.md).'
+  source: null
+  parent: SYS-F-001
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_commands_takeoff_then_route_to_entrance
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_route_must_end_at_entrance
+  - tools/sim_tests/test_i1_mission.py::test_uav_flew_the_predefined_route_to_the_entrance
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-003
+  text: When a path is received, the trajectory planner shall stream set-points along its straight segments with speed at most 5 m/s and acceleration at most 4 m/s^2, at 50 Hz on /command/trajectory.
+  category: derived
+  criticality: B
+  rationale: 'D-41 (E-40): 4 m/s^2, two runs without a bump, tracking error at most 0.61 m, distance flown in 30 min 3855 m -> 5149 m. Earlier: 2 m/s^2. Turns 60 deg/s (D-52).'
+  source: null
+  parent: SYS-F-001
+  allocated_to:
+  - cave_planning
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_profile_can_start_at_speed_along_its_first_segment
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_setpoint_acceleration_and_speed_stay_within_limits
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_a_path_queued_during_braking_starts_at_the_estimate_when_the_brake_ends
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_a_path_queued_on_a_rounded_corner_is_joined_at_the_next_straight
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_a_turn_in_place_takes_pi_over_the_yaw_rate
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_new_path_during_motion_keeps_setpoint_velocity_continuous
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_new_path_when_idle_starts_from_last_setpoint
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_path_queued_when_it_cannot_be_joined_still_starts_at_rest
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_path_queued_while_flying_straight_is_joined_without_stopping
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_path_without_any_start_is_rejected
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_published_acceleration_never_exceeds_a_max
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_stop_brakes_to_rest_within_the_acceleration_limit_and_next_path_starts_at_the_estimate
+  - ros2_ws/src/cave_planning/test/test_trajectory_msg.py::test_trajectory_message_carries_position_velocity_acceleration_and_yaw
+  - ros2_ws/src/cave_planning/test/test_trapezoid.py::test_profile_respects_speed_and_acceleration_limits
+  - ros2_ws/src/cave_planning/test/test_trapezoid.py::test_profile_starts_and_ends_at_waypoints_at_rest
+  - ros2_ws/src/cave_planning/test/test_trapezoid.py::test_profile_stops_at_intermediate_waypoint
+  - ros2_ws/src/cave_planning/test/test_trapezoid.py::test_segment_timing_trapezoid
+  - ros2_ws/src/cave_planning/test/test_trapezoid.py::test_segment_timing_triangle_for_short_segment
+  - ros2_ws/src/cave_planning/test/test_trapezoid.py::test_single_or_duplicate_waypoints_hold_position
+  - ros2_ws/src/cave_planning/test/test_trapezoid.py::test_yaw_follows_horizontal_direction_and_is_kept_on_vertical_moves
+  - ros2_ws/src/cave_planning/test/test_trapezoid.py::test_yaw_turns_in_place_at_limited_rate_before_moving
+  - tools/sim_tests/test_i1_mission.py::test_setpoint_velocity_changes_within_acceleration_limit
+  - tools/sim_tests/test_i1_mission.py::test_setpoints_respect_limits_and_are_tracked
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-004
+  text: When the estimated UAV position first comes within 1.0 m of the entrance point, the mission node shall publish a builtin_interfaces/Time message on /mission/entrance_reached with transient-local durability.
+  category: derived
+  criticality: B
+  rationale: 'D-11: transient-local durability lets a late subscriber (scoring tool, RViz) still receive the one-off event.'
+  source: null
+  parent: SYS-F-002
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_entrance_event_fires_once_at_first_arrival_within_tolerance
+  - tools/sim_tests/test_i1_mission.py::test_entrance_event_is_latched_and_first_arrival
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-005
+  text: The perception pipeline shall insert point clouds computed from every depth image into an OctoMap in frame 'world' with a sensor range limit of 20 m.
+  category: derived
+  criticality: B
+  rationale: 'D-12: our own OctoMap mapper inserts every depth image (octomap_server kept only 26-48 %, evidence/E-13.md); the 20 m range bounds ray cost.'
+  source: null
+  parent: SYS-F-007
+  allocated_to:
+  - cave_perception
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_perception/test/test_depth_projection.cpp::DepthProjection.BackProjectsMillimetresToOpticalFrame
+  - ros2_ws/src/cave_perception/test/test_depth_projection.cpp::DepthProjection.NoReturnPixelsBecomePointsAtTheGivenRangeWhenRequested
+  - ros2_ws/src/cave_perception/test/test_depth_projection.cpp::DepthProjection.NoReturnProjectionKeepsOnlyZeroPixelsAtTheGivenRange
+  - ros2_ws/src/cave_perception/test/test_depth_projection.cpp::DepthProjection.SkipsZerosAndPointsCloserThanMinRange
+  - ros2_ws/src/cave_perception/test/test_depth_projection.cpp::DepthProjection.StrideSamplesEveryNthPixelAndHonoursRowPadding
+  - ros2_ws/src/cave_perception/test/test_insertion_stats.cpp::InsertionStats.EmptyStatsAreZero
+  - ros2_ws/src/cave_perception/test/test_insertion_stats.cpp::InsertionStats.MissesBeforeFirstInsertAreCountedApartFromLaterFailures
+  - ros2_ws/src/cave_perception/test/test_insertion_stats.cpp::InsertionStats.TracksStampWindowAndInsertTimes
+  - tools/sim_tests/test_i1_mission.py::test_mapper_inserts_every_depth_image_after_the_first
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-006
+  text: The map writer shall write the map files to the run output directory at least every 30 s, each by writing a temporary file and renaming it.
+  category: derived
+  criticality: B
+  rationale: 'D-09: an atomic rename means a crash never leaves a half-written map file.'
+  source: null
+  parent: SYS-F-009
+  allocated_to:
+  - cave_perception
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_bringup/test/test_launch_helpers.py::test_make_run_dir_creates_stamped_dir_and_moves_latest
+  - ros2_ws/src/cave_perception/test/test_map_io.cpp::MapIo.AtomicWriteReplacesFileAndLeavesNoTemp
+  - ros2_ws/src/cave_perception/test/test_map_io.cpp::MapIo.FailedWriterKeepsPreviousFile
+  - tools/sim_tests/test_i1_mission.py::test_map_files_rewritten_at_least_every_30_s
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-007
+  text: The mission node shall write lanterns.csv with header 'id,x,y,z' to the run output directory at least every 10 s, by writing a temporary file and renaming it.
+  category: derived
+  criticality: B
+  rationale: 'D-09: an atomic rename means a crash never leaves a half-written lantern file.'
+  source: null
+  parent: SYS-F-008
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_bringup/test/test_launch_helpers.py::test_make_run_dir_creates_stamped_dir_and_moves_latest
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_lantern_csv_has_header_and_one_line_per_lantern
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_try_write_atomic_reports_failure_instead_of_raising
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_write_atomic_failure_keeps_previous_file
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_write_atomic_replaces_file_and_leaves_no_temp
+  - tools/sim_tests/test_i1_mission.py::test_lantern_file_rewritten_at_least_every_10_s
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-008
+  text: Where the WSL GPU device node /dev/dxg exists, the launch file shall start the Unity player with GALLIUM_DRIVER=d3d12.
+  category: derived
+  criticality: B
+  rationale: 'D-10: without it WSLg renders on the CPU and the cameras fall to 1.6 Hz (evidence/E-02.md).'
+  source: null
+  parent: SYS-C-004
+  allocated_to:
+  - cave_bringup
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_bringup/test/test_launch_helpers.py::test_unity_gets_d3d12_only_when_wsl_gpu_node_exists
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-009
+  text: While no state estimate has arrived for more than 0.5 s, the mission node shall publish no new path.
+  category: derived
+  criticality: B
+  rationale: Direct refinement of SYS-S-002 for the mission node, the only publisher of paths in I1.
+  source: null
+  parent: SYS-S-002
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_no_path_published_while_state_estimate_is_stale
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_transitions_that_need_a_pose_wait_for_fresh_estimate
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_waits_for_both_state_estimate_and_depth
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-010
+  text: The mission, planning and perception nodes shall obtain the UAV position only from /current_state_est and from the world-to-body transform published by the state estimate corruptor.
+  category: derived
+  criticality: A
+  rationale: 'D-04: the corruptor''s outputs are the only permitted pose source; truth topics are reserved for offline scoring tools.'
+  source: null
+  parent: SYS-C-001
+  allocated_to:
+  - cave_mission
+  - cave_planning
+  - cave_perception
+  moc: inspection
+  verified_by:
+  - evidence/I1-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-011
+  text: The perception pipeline shall configure the OctoMap resolution to 0.25 m.
+  category: derived
+  criticality: B
+  rationale: 'D-08: 0.25 m meets the 0.5 m threshold of SYS-P-003 with margin; passages are >= 22 m wide (E-06).'
+  source: null
+  parent: SYS-P-003
+  allocated_to:
+  - cave_perception
+  moc: inspection
+  verified_by:
+  - evidence/I1-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-012
+  text: The map writer shall write the map both as an OctoMap binary file (cave_map.bt) and as a PLY point file of occupied voxel centres (cave_map.ply).
+  category: derived
+  criticality: B
+  rationale: 'D-09: .bt opens in octovis; .ply opens in MeshLab and CloudCompare, all freely available.'
+  source: null
+  parent: SYS-I-002
+  allocated_to:
+  - cave_perception
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_perception/test/test_map_io.cpp::MapIo.BinaryTreeRoundTrips
+  - ros2_ws/src/cave_perception/test/test_map_io.cpp::MapIo.PlyListsOccupiedVoxelCentres
+  - tools/sim_tests/test_i1_mission.py::test_map_files_have_octomap_and_ply_headers
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I1
+- id: ITEM-D-013
+  text: When asked for an exploration goal, the path planner shall select it only from frontier voxels of the navigation map built from depth images of the current run that lie beyond the entrance plane.
+  category: derived
+  criticality: A
+  rationale: 'D-13: frontiers come only from this run''s sensing; the entrance plane follows from the predefined approach route, not from cave knowledge.'
+  source: null
+  parent: SYS-C-002
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ALongFrontierSheetIsSplitIntoSeveralGoals
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.OpenSkyNeedsSkyEvidenceOverAWideCylinder
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.PrefersPushingDeeperHorizontallyOverClimbing
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.SelectsOnlyFrontiersBeyondTheEntrancePlane
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.FreeCellWithUnknownNeighbourIsFrontierUntilSurrounded
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.OccupiedCellIsNeverFrontier
+  - tools/sim_tests/test_i2_exploration.py::test_exploration_goals_lie_beyond_the_entrance_plane_inside_the_cave
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-014
+  text: While the mission is in EXPLORE, the mission node shall publish only paths returned by the path planner's exploration service.
+  category: derived
+  criticality: A
+  rationale: 'D-16: no predefined waypoint is flown after the entrance event (brief 4.2).'
+  source: null
+  parent: SYS-C-002
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_late_reply_to_a_timed_out_request_from_the_same_start_is_used
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_lost_planner_reply_times_out_and_is_retried
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_arrival_at_explore_goal_requests_the_next_goal
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_explore_goal_timeout_requests_a_new_goal
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_explore_publishes_only_the_paths_the_planner_returns
+  - tools/sim_tests/test_i2_exploration.py::test_every_path_flown_in_explore_came_from_the_planner
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-015
+  text: The system shall run the mission state machine, the depth-to-voxel mapper, the path planner and the trajectory planner as four separate ROS nodes in separate packages.
+  category: derived
+  criticality: B
+  rationale: 'D-02, D-13: one package per module; the planner''s node is new in I2.'
+  source: null
+  parent: SYS-C-009
+  allocated_to:
+  - cave_mission
+  - cave_perception
+  - cave_navigation
+  - cave_planning
+  moc: inspection
+  verified_by:
+  - evidence/I2-inspection.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-016
+  text: The path planner shall return only paths whose points all lie in known-free space at least 1.0 m from every occupied voxel of the navigation map, except points within 3.0 m of a start that is itself closer than 1.0 m, which shall be no closer to any occupied or unknown voxel than the start.
+  category: derived
+  criticality: A
+  rationale: 'D-14, D-17: 1.0 m covers UAV radius, 0.46 m tracking error and quantisation; near a start that later observations put inside the clearance, the path may only move away (evidence/E-16.md); zone 3 m (customer Q-25, E-28).'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.ObstacleDistanceIsTheNearestNonFreeCentreWithinTheClearanceRadius
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.SkyRaysAreKeptApartFromTheNavigationCells
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.TraversableRequiresFreeCellAndClearanceFromOccupied
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.UnknownCellIsNotTraversable
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.UnknownCellWithinClearanceBlocksTraversal
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.AFreeStartWhoseEscapeZoneHasNoExitIsStartBlocked
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.AStartInAThinLayerEscapesThroughA3mZoneNeverGettingCloser
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.EscapePathsNeverGetCloserToTheObstacleThanTheStartExactly
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.EscapeZoneNeverLetsThePathFollowTheWall
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.EveryPointAlongThePathKeepsTheClearanceFromOccupiedVoxels
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.FallsBackToOneMetreClearanceInNarrowGap
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.FindsPathThroughGapAndEveryPointKeepsClearance
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.NeverPlansIntoUnknownSpace
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.NoPathThroughSolidWall
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.PathEndsExactlyAtAReachableGoal
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.PathToOwnCellIsSinglePoint
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.StartInANonFreeCellIsStartBlocked
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.StartInsideTheClearanceEscapesWithoutGettingCloserThenKeepsFullClearance
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.WeightedHeuristicPlansALongWideSpaceWithFarFewerExpansions
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_a_corner_inside_the_3m_escape_zone_is_not_rounded
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_corners_right_after_a_protected_point_are_not_rounded
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_vertices_near_the_start_are_not_rounded
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_a_join_keeps_the_protection_of_the_escape_path_start
+  - tools/sim_tests/test_i2_exploration.py::test_planner_paths_use_at_least_one_metre_clearance
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-017
+  text: The trajectory planner shall limit the commanded speed to 4 m/s during the whole mission, approach and cave alike.
+  category: derived
+  criticality: B
+  rationale: 'D-15 (E-33: 4 m/s, no bump, safety tests pass in 2 runs): 0.8 m of travel between 5 Hz depth frames; one mission-wide value, which supersedes the 5 m/s of D-07 (ITEM-D-003 remains a bound).'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_planning
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_setpoint_acceleration_and_speed_stay_within_limits
+  - ros2_ws/src/cave_planning/test/test_trajectory_msg.py::test_trajectory_node_default_speed_limit_is_4_m_per_s
+  - tools/sim_tests/test_i2_exploration.py::test_commanded_speed_never_exceeds_4_m_per_s
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-018
+  text: If the path planner finds no path to a selected frontier goal, then it shall exclude goals within 5 m of that goal and select the next-best frontier.
+  category: derived
+  criticality: B
+  rationale: 'D-16: blacklisting stops the explorer retrying an unreachable goal.'
+  source: null
+  parent: SYS-S-003
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ABoxedInFreeStartExcludesNoGoal
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AFailureOfTheStartExcludesNoGoal
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AGoalWhosePathIsBlockedTwiceIsSetAside
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ARequestStopsTryingGoalsOnceItsTimeIsUpAndTheNextRequestGoesOn
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.BlacklistsUnreachableGoalAndSelectsTheNextBest
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.BudgetFailuresAreSetAsideForAWhileSoOtherGoalsGetTried
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.ReportsBudgetExhaustionApartFromAProvenNoPath
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-019
+  text: While no exploration path is available, the mission node shall publish no new path.
+  category: derived
+  criticality: B
+  rationale: 'D-16: without a new path the trajectory planner holds the last set-point, which is the hold of SYS-S-003.'
+  source: null
+  parent: SYS-S-003
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_flight_timeout_holds_at_the_current_position_and_replans_from_there
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_no_path_published_while_no_exploration_path_is_available
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-020
+  text: When the lantern list on /perception/lanterns first holds at least four lanterns, the mission node shall switch to RETURN and publish the path the path planner returns to the entrance point.
+  category: derived
+  criticality: B
+  rationale: 'D-01, D-16: return immediately after the fourth lantern.'
+  source: null
+  parent: SYS-F-006
+  allocated_to:
+  - cave_mission
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_four_lanterns_trigger_return_with_the_planned_path
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_late_explore_result_after_return_is_ignored
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_return_requested_mid_flight_is_planned_from_the_committed_path_end
+  - tools/sim_tests/test_i2_exploration.py::test_four_lanterns_switch_mission_to_return
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-021
+  text: When the exploration service reports that no reachable frontier remains, the mission node shall switch to RETURN and publish the path the path planner returns to the entrance point.
+  category: derived
+  criticality: B
+  rationale: 'D-16: with nothing left to explore, returning is the only useful action.'
+  source: null
+  parent: SYS-F-006
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_no_frontier_left_triggers_return_with_the_planned_path
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ReportsNoneLeftWithoutEligibleFrontiers
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-F-016
+  text: If the corrupted state estimate of the UAV position stays within 1.0 m of its value at the start of any continuous 120 s period that begins after take-off starts and ends before the UAV comes within 1.0 m of the cave entrance point after four distinct cave lanterns have been reported, then the UAV system shall declare the mission failed.
+  category: functional
+  criticality: A
+  rationale: 'Customer-imposed (Q-10, Q-11): stops waiting 30 min on a clearly inoperative UAV. Sliding 120 s window, maximum excursion from its start, well above the 5 mm estimate noise. Deliberate holds count. The final hold at the entrance is the intended end state and is excluded.'
+  source: 'Customer request 2026-09-29 (Q-09 gate): ''if the UAV does not move for more than 2 minutes, mission is considered automatically as failed'''
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_stall_watchdog.py::test_reset_restarts_the_window
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_at_the_entrance_with_four_lanterns_is_not_watched_even_before_hold
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_hold_is_not_watched
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_hold_without_four_lanterns_is_still_watched
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_hovering_120_s_in_explore_declares_failure_once
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_stale_position_still_counts_as_not_moving
+  - tools/sim_tests/test_i2_failure.py::test_failure_declared_within_2_s_of_120_s_without_movement
+  - tools/sim_tests/test_i2_failure.py::test_nominal_run_declares_no_failure
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-F-029
+  text: If the state estimate and the depth images have not both arrived within 120 s of the start of the mission stack, then the UAV system shall declare the mission failed.
+  category: functional
+  criticality: A
+  rationale: 'Run 20261004-151458: the simulator bridge died at start-up, no sensor data arrived and the run waited until the time cap without declaring a failure.'
+  source: 'Customer request 2026-10-04 (Q-45): ''Yeah, implement the rule'' - a run with no sensors after N seconds is declared failed.'
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_no_sensors_for_120_s_declares_failure
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_sensors_arriving_within_120_s_start_the_mission
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: SYS-F-017
+  text: When the mission has been declared failed, the UAV system shall end the run, stopping every process started by its launch file, within 15 s of the declaration.
+  category: functional
+  criticality: A
+  rationale: 'Customer (Q-11): a failed mission ends the run immediately. 15 s leaves time for the final file writes (SYS-F-018/019) and the failure report (SYS-F-020/021) that precede shutdown.'
+  source: 'Customer request 2026-09-29 (Q-09 gate): ''if the UAV does not move for more than 2 minutes, mission is considered automatically as failed'''
+  parent: null
+  allocated_to:
+  - cave_mission
+  - cave_bringup
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i2_failure.py::test_mapper_keeps_the_failure_write_instead_of_rewriting_at_shutdown
+  - tools/sim_tests/test_i2_failure.py::test_run_ends_within_15_s_of_the_declaration
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-F-018
+  text: When the mission has been declared failed, the UAV system shall write the final lantern positions to the lantern file.
+  category: functional
+  criticality: A
+  rationale: 'Brief 1.3: both output files are written even when the mission fails. Extends SYS-F-014/015 (completion, SIGINT) to a third run end, the declared failure, without re-opening them.'
+  source: 'Customer request 2026-09-29 (Q-09 gate): ''if the UAV does not move for more than 2 minutes, mission is considered automatically as failed'''
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i2_failure.py::test_lantern_file_written_after_failure
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-F-019
+  text: When the mission has been declared failed, the UAV system shall write the final cave representation to the map file.
+  category: functional
+  criticality: A
+  rationale: 'Brief 1.3: both output files are written even when the mission fails. Extends SYS-F-014/015 (completion, SIGINT) to a third run end, the declared failure, without re-opening them.'
+  source: 'Customer request 2026-09-29 (Q-09 gate): ''if the UAV does not move for more than 2 minutes, mission is considered automatically as failed'''
+  parent: null
+  allocated_to:
+  - cave_perception
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i2_failure.py::test_map_written_on_failure_before_the_node_exits
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-F-020
+  text: When the mission is declared failed, the UAV system shall publish a mission-failed event carrying the timestamp of the declaration.
+  category: functional
+  criticality: A
+  rationale: Makes the failure outcome observable to the operator and the scorer, mirroring the entrance event (SYS-F-002).
+  source: 'Customer request 2026-09-29 (Q-09 gate): ''if the UAV does not move for more than 2 minutes, mission is considered automatically as failed'''
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i2_failure.py::test_mission_failed_event_published_once_with_its_timestamp
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: SYS-F-021
+  text: When the mission is declared failed, the UAV system shall write a log line containing the timestamp of the declaration.
+  category: functional
+  criticality: B
+  rationale: The log survives a crashed run and is what the scorer reads (as SYS-F-003).
+  source: 'Customer request 2026-09-29 (Q-09 gate): ''if the UAV does not move for more than 2 minutes, mission is considered automatically as failed'''
+  parent: null
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_append_event_writes_extra_values
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_append_event_writes_name_and_time
+  - ros2_ws/src/cave_mission/test/test_outputs.py::test_try_append_event_reports_failure_instead_of_raising
+  - tools/sim_tests/test_i2_failure.py::test_failure_logged_with_the_published_timestamp
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-022
+  text: From the start of take-off until the UAV first comes within 1.0 m of the cave entrance point with four distinct cave lanterns reported, the mission node shall sample the corrupted state estimate at 1 Hz and, when every sample of the last 120 s lies within 1.0 m of the sample taken 120 s earlier, enter the state FAILED within 2 s.
+  category: derived
+  criticality: A
+  rationale: 'D-18 (revised after E-17): the watch ends at SYS-F-016''s end event, not at a state; 1 Hz sampling declares at most 1 s late and never early.'
+  source: null
+  parent: SYS-F-016
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_stall_watchdog.py::test_a_stall_after_flight_is_timed_from_when_motion_stopped
+  - ros2_ws/src/cave_mission/test/test_stall_watchdog.py::test_hovering_is_declared_between_120_and_122_s
+  - ros2_ws/src/cave_mission/test/test_stall_watchdog.py::test_no_position_yet_is_never_a_stall
+  - ros2_ws/src/cave_mission/test/test_stall_watchdog.py::test_slow_motion_just_over_one_metre_per_120_s_is_not_a_stall
+  - ros2_ws/src/cave_mission/test/test_stall_watchdog.py::test_wandering_inside_the_radius_is_a_stall
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_at_the_entrance_with_four_lanterns_is_not_watched_even_before_hold
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_hold_without_four_lanterns_is_still_watched
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_hovering_120_s_in_explore_declares_failure_once
+  - tools/sim_tests/test_i2_failure.py::test_failure_declared_within_2_s_of_120_s_without_movement
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-023
+  text: When the mission node enters FAILED, it shall publish no further paths and shall exit after the cave mapper reports its FAILED-state write or 8 s after entering FAILED, whichever comes first.
+  category: derived
+  criticality: A
+  rationale: 'D-18: files are on disk before shutdown starts; 8 s bounds a stuck write inside the 15 s of SYS-F-017.'
+  source: null
+  parent: SYS-F-017
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_exits_8_s_after_failure_without_map_notice
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_exits_when_the_map_is_written_or_8_s_after_failure
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_late_replies_after_failure_release_no_path
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_no_path_or_request_after_failure
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_should_exit_is_false_unless_failed
+  - tools/sim_tests/test_i2_failure.py::test_no_path_after_failure_and_node_exits_within_8_s
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-024
+  text: When the mission node process exits, the launch file shall shut down every process it started.
+  category: derived
+  criticality: A
+  rationale: 'D-18: OnProcessExit on the mission node emits the launch Shutdown event (SIGINT to all).'
+  source: null
+  parent: SYS-F-017
+  allocated_to:
+  - cave_bringup
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_bringup/test/test_launch_run_end.py::test_mission_node_exit_emits_launch_shutdown
+  - tools/sim_tests/test_i2_failure.py::test_run_ends_within_15_s_of_the_declaration
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-025
+  text: When the mission state becomes FAILED, the cave mapper shall write its map files and then publish a final-written notice.
+  category: derived
+  criticality: A
+  rationale: 'D-18: the map file holds the final map before the run ends; the notice lets the mission node exit early.'
+  source: null
+  parent: SYS-F-019
+  allocated_to:
+  - cave_perception
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i2_failure.py::test_map_written_on_failure_before_the_node_exits
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I2
+- id: ITEM-D-026
+  text: While the mission state is EXPLORE or RETURN, the lantern node shall treat each 4-connected blob of semantic-image pixels of colour exactly (255,235,4) that has at least 3 pixels with valid depth (non-zero and below 49.5 m) and a median range of at least 2 m and at most 45 m as one lantern observation, provided that, when the median range r is at least 8 m, the number of its pixels with valid depth is at least 2000 / r^2.
+  category: derived
+  criticality: A
+  rationale: 'D-19, D-21: E-12 shows lanterns only as exact-colour pixels; EXPLORE starts at the entrance event.'
+  source: null
+  parent: SYS-F-004
+  allocated_to:
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_a_blob_too_small_for_a_lantern_at_its_depth_is_no_observation
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_blob_beyond_45_m_is_no_observation
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_blob_nearer_than_2_m_is_no_observation
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_blob_needs_3_pixels_with_valid_depth
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_blobs_touching_only_diagonally_are_two_observations
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_depth_at_or_beyond_49_5_m_is_invalid
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_each_4_connected_blob_is_one_observation
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_near_colour_pixels_are_not_lantern
+  - ros2_ws/src/cave_lanterns/test/test_node_helpers.py::test_inactive_until_explore
+  - tools/sim_tests/test_i3_lanterns.py::test_lantern_3_in_the_gallery_is_detected_and_reported
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-027
+  text: The lantern node shall estimate each lantern position as the median of x, the median of y and the mid-point of the 2nd to 98th percentile z extent of the world points of its observations, back-projected with the depth image and the estimated camera pose at the image stamp, keeping at most 2000 points and dropping those of the farthest observations first.
+  category: derived
+  criticality: A
+  rationale: 'D-19: the E-10 (not published) estimator; with the 45 m gate its error against the E-10 (not published) truth was 0.43 m with near views and at most 1.5 m from 40-45 m views alone (E-10 (not published) addendum).'
+  source: null
+  parent: SYS-P-001
+  allocated_to:
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_back_projection_uses_optical_frame_and_intrinsics
+  - ros2_ws/src/cave_lanterns/test/test_detection.py::test_to_world_applies_rotation_then_translation
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_estimate_is_median_xy_and_mid_extent_z
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_many_close_partial_views_do_not_evict_the_full_body_views
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_partial_views_converge_on_the_whole_body
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_point_cap_drops_farthest_observations_first
+  - ros2_ws/src/cave_lanterns/test/test_node_helpers.py::test_pairs_only_a_depth_image_of_the_same_instant
+  - ros2_ws/src/cave_lanterns/test/test_node_helpers.py::test_tf_buffer_fills_while_the_node_is_busy
+  - ros2_ws/src/cave_lanterns/test/test_node_helpers.py::test_transform_at_falls_back_to_the_newest_transform_within_tolerance
+  - tools/sim_tests/test_i3_lanterns.py::test_every_reported_lantern_is_within_2_m_of_a_cave_lantern
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: ITEM-D-028
+  text: The lantern node shall merge an observation into the nearest lantern, reported or candidate, whose estimate lies within 15 m of the observation's median point, shall merge two lanterns whose estimates come within 15 m of each other, and shall report a lantern only after it has at least 3 observations.
+  category: derived
+  criticality: A
+  rationale: 'D-20: 8 m is far below the 100 m lantern spacing (E-05 (not published)) and above the 4.5 m lantern body.'
+  source: null
+  parent: SYS-F-005
+  allocated_to:
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_an_observation_11_m_from_a_reported_lantern_merges_into_it
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_observation_joins_the_nearest_lantern_within_8_m
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_partial_blob_merges_into_the_same_lantern
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_reported_only_after_3_observations
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_two_lanterns_drifting_within_15_m_merge_into_the_earlier_reported
+  - tools/sim_tests/test_i3_lanterns.py::test_at_most_one_report_per_physical_lantern_throughout_the_run
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: ITEM-D-029
+  text: The lantern node shall report only lanterns whose position estimate lies beyond the entrance plane.
+  category: derived
+  criticality: A
+  rationale: 'D-21: the reference lantern is 245 m outside the entrance; the plane is the one of D-13.'
+  source: null
+  parent: SYS-F-013
+  allocated_to:
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_lanterns/test/test_lantern_map.py::test_lantern_before_the_entrance_plane_is_never_reported
+  - tools/sim_tests/test_i3_lanterns.py::test_the_start_lantern_is_never_reported
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: ITEM-D-030
+  text: While the mission is running, the lantern node shall publish the reported lanterns on /perception/lanterns as a geometry_msgs/PoseArray in the world frame at least once per second.
+  category: derived
+  criticality: C
+  rationale: 'D-22: the mission node already consumes this topic for the file and the return trigger.'
+  source: null
+  parent: SYS-F-010
+  allocated_to:
+  - cave_lanterns
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_lanterns/test/test_node_helpers.py::test_node_constructs_and_publishes_an_empty_list
+  - tools/sim_tests/test_i3_lanterns.py::test_lanterns_published_at_least_once_per_second
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: ITEM-D-031
+  text: The explorer shall select as exploration goals only frontier cells with at least one unknown horizontal neighbour cell, ranking travel as the horizontal distance plus three times the height climbed plus half the height descended.
+  category: derived
+  criticality: A
+  rationale: 'D-24 and customer Q-24 / Q-39: climbs weighted 3 (no creeping up chimneys); descents weighted 0.5 (E-44 run 1 took the descent to the deepest lantern at 750 s; earlier runs found it at 1800-2060 s).'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ADescentCostsItsHeightOnceByDefault
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ADescentWeightedLikeAClimbPrefersTheSideOpening
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.IgnoresFrontiersWithUnknownOnlyAbove
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.PrefersALevelOpeningOverANearerRaisedOne
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-032
+  text: If the estimated UAV position stays more than 0.5 m from the commanded set-point for 0.3 s, then the trajectory planner shall brake the set-point to rest within the acceleration limit and the path planner shall mark as occupied the navigation cells within 0.5 m of the point 0.6 m from the UAV towards the set-point.
+  category: derived
+  criticality: A
+  rationale: 'D-25 (Q-18): clean flight tracks within 0.35 m, contacts showed 0.66-0.85 m (E-19 (not published)); marking the bump keeps replanned paths away from a surface the camera cannot see.'
+  source: null
+  parent: SYS-S-004
+  allocated_to:
+  - cave_planning
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.AUavComingToRestInsideABumpMarkCanPlanOutOncePlanningClearsItsCell
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.BumpMarksSurviveDepthRaysThroughThemAndSpareTheUavCell
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.MarkedBumpKeepsNewPathsAwayFromIt
+  - ros2_ws/src/cave_planning/test/test_bump.py::test_a_new_episode_can_fire_again_after_recovery
+  - ros2_ws/src/cave_planning/test/test_bump.py::test_bump_after_0_3_s_more_than_0_5_m_behind_the_setpoint
+  - ros2_ws/src/cave_planning/test/test_bump.py::test_bump_point_is_0_6_m_from_the_uav_towards_the_setpoint
+  - ros2_ws/src/cave_planning/test/test_bump.py::test_clean_tracking_and_short_spikes_are_no_bump
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_a_path_queued_during_braking_starts_at_the_estimate
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_a_path_queued_during_braking_starts_at_the_estimate_when_the_brake_ends
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_stop_brakes_to_rest_within_the_acceleration_limit_and_next_path_starts_at_the_estimate
+  - tools/sim_tests/test_i2_exploration.py::test_after_each_bump_the_uav_moves_clear_and_the_mission_continues
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: ITEM-D-033
+  text: While a path is being flown, the path planner shall report it blocked when a navigation cell within 0.5 m of its remaining part becomes occupied after the path was received, and the trajectory planner shall then brake the set-point to rest within the acceleration limit.
+  category: derived
+  criticality: A
+  rationale: 'D-25 (Q-18): surfaces mapped only after planning (seen late, E-19 (not published)) are not flown into.'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_navigation
+  - cave_planning
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.PathBlockedIgnoresCellsGivenAsAlreadyKnown
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.RemainingPathIsBlockedOnlyByOccupiedCellsNearItsUnflownPart
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_stop_brakes_to_rest_within_the_acceleration_limit_and_next_path_starts_at_the_estimate
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_stop_drops_a_queued_path
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: ITEM-D-034
+  text: When a bump or a blocked path is reported, the mission node shall request a new plan starting from the current estimated position.
+  category: derived
+  criticality: B
+  rationale: 'D-25: recovery instead of pressing on until the no-movement failure (run 20260929-192814).'
+  source: null
+  parent: SYS-S-004
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_bump_during_return_replans_the_return_from_the_current_position
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_bump_while_already_replanning_is_ignored
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_bump_while_flying_replans_from_the_current_position
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_failed_replan_after_a_stop_is_retried_from_where_the_uav_came_to_rest
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_failed_return_plan_requested_mid_flight_is_retried_from_the_committed_path_end
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_failed_return_replan_after_a_stop_is_retried_from_where_the_uav_came_to_rest
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_stop_during_the_approach_resumes_only_the_waypoints_not_yet_reached
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_stop_during_the_approach_resumes_the_route_from_where_the_uav_is
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_repeated_stops_at_one_spot_on_the_approach_are_not_retried_forever
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_stale_reply_after_a_bump_is_dropped
+  - tools/sim_tests/test_i2_exploration.py::test_after_each_bump_the_uav_moves_clear_and_the_mission_continues
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: SYS-S-004
+  text: If the UAV touches a surface that its depth camera cannot observe, then the UAV system shall continue the mission from a position clear of that surface.
+  category: safety
+  criticality: A
+  rationale: 'Customer (Q-19): brief contact with simulator objects the camera never shows is acceptable if the UAV recovers and continues (E-19 (not published), D-25).'
+  source: Customer decision Q-19, 2026-09-29
+  parent: null
+  allocated_to:
+  - cave_planning
+  - cave_navigation
+  - cave_mission
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i2_exploration.py::test_after_each_bump_the_uav_moves_clear_and_the_mission_continues
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I3
+- id: ITEM-D-035
+  text: The explorer shall not select a frontier goal less than 300 m past the entrance plane when at least 15 % of the cells of a vertical cylinder of radius 8 m from 5 m to 45 m above it hold sky evidence from no-return depth rays.
+  category: derived
+  criticality: A
+  rationale: 'D-26 (E-20): outdoor points measured 0.19-0.27, cave points 0.04-0.10; the UAV left the cave in 3 of 18 runs.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ADeepFrontierUnderSkyEvidenceStaysAGoal
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.DropsAFrontierUnderWideOpenSky
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.OpenSkyNeedsSkyEvidenceOverAWideCylinder
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.SkyIsCheckedOnlyForTheCandidatesItTries
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-036
+  text: The explorer shall rank frontier goals by the travel distance of ITEM-D-031 from the request's start point minus 0.05 times the frontier size in cells, plus the deferral of ITEM-D-042, with no term for distance from the entrance.
+  category: derived
+  criticality: B
+  rationale: 'D-27 (E-18): the entrance-distance bonus skipped the branches to Lantern (2) and Lantern. D-33 (E-24) adds the deferral of leftovers over the flown track.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ChoosesTheNearerOpeningEvenIfItIsCloserToTheEntrance
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.SkipsGoalsCloserThanTheMinimumDistance
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-037
+  text: While a planned exploration path is being flown, when at most 6 m of it remain along the path from its point nearest the estimated position, the mission node shall request the next exploration path starting at that path's end, and shall discard that request's reply when a bump or blocked path is reported before it arrives.
+  category: derived
+  criticality: B
+  rationale: 'D-28 (E-21): planning waits are 11-13 % of exploration time; a bump during the request replans from the current position (ITEM-D-034).'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_failed_early_request_is_retried_from_the_end_of_the_path_being_flown
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_late_reply_from_another_start_is_still_dropped
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_early_request_when_6_m_remain_from_the_committed_end
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_no_early_request_during_return
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_reply_to_an_early_request_is_released_at_once
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_stale_reply_after_a_bump_is_dropped
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-038
+  text: The map quality tool shall report the fraction of reference cave-surface points within 5 m of the flown path beyond the entrance plane that have an occupied voxel of the run's map within 0.5 m.
+  category: derived
+  criticality: B
+  rationale: 'D-29: the SYS-P-004 criterion computed from the files every run writes.'
+  source: null
+  parent: SYS-P-004
+  allocated_to:
+  - tools
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_map_quality_unit.py::test_coverage_counts_reference_points_near_the_path_that_have_a_mapped_voxel_near_them
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-039
+  text: While exploring, the UAV system shall fly at a mean pace of at least 1.6 m/s, measured as distance flown divided by the time in the EXPLORE state.
+  category: derived
+  criticality: B
+  rationale: 'I4 time budget (E-21): an about 2400 m four-lantern tour needs about 1.6 m/s to fit 1800 s; 1.14-1.30 m/s measured.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_mission
+  - cave_planning
+  - cave_navigation
+  moc: test
+  verified_by:
+  - tools/sim_tests/test_i4_mission.py::test_exploration_pace_at_least_1_6_m_per_s
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-040
+  text: The trajectory planner shall round each intermediate path waypoint with a circular arc departing at most 0.25 m from the planned path, fly each arc of radius r at no more than the square root of a_max times r, keep the set-point acceleration within a_max, and turn the yaw in place only before a direction change of more than 90 degrees.
+  category: derived
+  criticality: B
+  rationale: 'D-30 (E-21, review N1): rest-to-rest segments and turn-in-place stops keep moving speed at 1.6-1.8 m/s; arcs within 0.25 m keep the 1.0 m clearance of ITEM-D-016.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_planning
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_a_corner_inside_the_3m_escape_zone_is_not_rounded
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_arc_deviation_from_the_polyline_is_at_most_0_25_m
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_corners_right_after_a_protected_point_are_not_rounded
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_gentle_bend_is_passed_without_stopping
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_hard_corner_stops_and_turns_in_place
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_profile_can_start_at_speed_along_its_first_segment
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_setpoint_acceleration_and_speed_stay_within_limits
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_start_speed_is_infeasible_when_the_path_ends_too_soon
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_two_point_path_is_rest_to_rest_like_the_trapezoid
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_vertices_near_the_start_are_not_rounded
+  - ros2_ws/src/cave_planning/test/test_smooth.py::test_yaw_is_turned_while_moving_for_gentle_corners
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_path_queued_while_flying_straight_is_joined_without_stopping
+  - ros2_ws/src/cave_planning/test/test_streamer.py::test_published_acceleration_never_exceeds_a_max
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-041
+  text: Before the cave mapper publishes or writes a map snapshot, it shall free every occupied voxel of the finest resolution that has no other occupied voxel within 1.0 m.
+  category: derived
+  criticality: B
+  rationale: 'D-32 (E-23): 90-145 lone voxels per 30 min run, each more than 2 m from the cave surface, are depth noise; one stood 0.63 m from the UAV in run 20260930-023723. Navigation uses its own map, so no obstacle is lost.'
+  source: null
+  parent: SYS-P-004
+  allocated_to:
+  - cave_perception
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_perception/test/test_map_io.cpp::MapIo.RemoveSpecksFreesOnlyOccupiedVoxelsWithNoOccupiedVoxelWithinTheRadius
+  - ros2_ws/src/cave_perception/test/test_map_io.cpp::MapIo.RemoveSpecksKeepsAVoxelNextToAPrunedOccupiedBlock
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-042
+  text: The explorer shall add 150 m to the rank of a frontier goal that lies within 8 m horizontally of a point of the flown track beyond the entrance and more than 4 m above it, unless a point of the flown track lies within 8 m horizontally and within 4 m in height of the goal.
+  category: derived
+  criticality: B
+  rationale: 'D-33 (E-24): nearest-first followed unseen ceiling above the flown tunnel back towards the entrance for 480 s of a 30 min run, while the passages to the two missing lanterns were left.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.DefersAnOpeningHighAboveTheFlownTrackBehindANewOne
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.KeepsASideOpeningAtTheHeightOfTheFlownTrack
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.KeepsAnOpeningBelowTheFlownTrack
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-043
+  text: The explorer shall not offer a frontier goal within 6 m of a goal it has already released for flight.
+  category: derived
+  criticality: B
+  rationale: 'D-34 (E-26): goals 3-5 m from earlier ones (frontiers flying there did not reveal) took 7-29 % of the goal time in three 30 min runs, and a 3 min ping-pong in run 20260930-052139.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AGoalFlownToIsNotOfferedAgain
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AGoalNotReachedIsOfferedAgain
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.NoGoalIsOfferedWithin6mOfAGoalFlownTo
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-044
+  text: While exploring, when the median over the last 10 depth images of the fraction of pixels looking more than 30 degrees up with no return or a range of at least 49.5 m is at least 0.4, and the camera is at least 10 m past the entrance plane, the explorer shall not select a frontier goal less than 300 m past the entrance plane within 45 m of the camera inside its field of view (106 degrees horizontal, 90 degrees vertical) at that image whose straight line from the camera passes only through known-free cells (except within 1 m of the goal).
+  category: derived
+  criticality: A
+  rationale: 'D-35 (E-31): the D-26 sky test decides only once the UAV is in the open valley south of the mouth; the upward depth rows see open sky at its opening (median 0.64 in the valley, 0 of 9508 cave frames flagged).'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AFrontierInsideAnOutdoorViewIsNotAGoal
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AFrontierOutsideTheOutdoorViewStaysAGoal
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOutdoorViewDoesNotExcludeFrontiersBehindRock
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOutdoorViewExcludesNoFrontierBeyondTheOutdoorDepth
+  - ros2_ws/src/cave_navigation/test/test_outdoor_cue.cpp::OutdoorCue.FiresOnlyWhenTheMedianOfTheLastTenFramesReaches0_4
+  - ros2_ws/src/cave_navigation/test/test_outdoor_cue.cpp::OutdoorCue.UpwardFractionCountsNoReturnAndFarPixelsInTheUpperRowsOnly
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-045
+  text: The explorer shall try frontier goals in passage regions of at least 6 bins first, the region passed most recently by the flown track first, and goals in smaller regions only when no passage-region goal yields a path.
+  category: derived
+  criticality: B
+  rationale: 'Retired: E-36 did not adopt it (mean 2.67 lanterns against 2.75; the anchor rule led the UAV back to the mouth). D-37 (E-36): in the I4 runs the time was lost in gallery pockets (470-700 s) and in branches left half explored when another frontier was nearer; ranking tweaks (E-29, E-32, E-34) did not help.'
+  source: null
+  parent: SYS-P-002
+  allocated_to: null
+  moc: test
+  verified_by: []
+  status: retired
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: ITEM-D-046
+  text: While exploring, the explorer shall not select a frontier goal less than 300 m past the entrance plane within 30 m, measured horizontally, of the camera position of any outdoor view (ITEM-D-044) recorded after the flown track had reached 50 m past the entrance plane or with the camera at least 25 m, measured horizontally, from the entrance point.
+  category: derived
+  criticality: A
+  rationale: 'D-38: the camera of an outdoor view is under open sky; in acceptance run 20261002-192153 the UAV explored the valley for 1700 s despite 711 outdoor views. Replay: tools/probes/outdoor_radius.py.'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AFrontierNearAnOutdoorViewCameraIsNotAGoalWhicheverWayItLooked
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOutdoorViewExcludesNoFrontierBeyondTheOutdoorDepth
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOutdoorViewFarFromTheEntranceCountsBeforeBeingDeep
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOutdoorViewTakenAfterBeingDeepExcludesEvenTheLastFrontier
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOutdoorViewTakenBeforeBeingDeepHasNoZone
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.WithTheOutdoorZoneOffANearbyViewLookingAwayExcludesNothing
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: ITEM-D-047
+  text: When every fallback clearance ends without a path after fewer than 3000 search expansions, the path planner shall plan once more with 0.75 m clearance, and the explorer shall not exclude that goal.
+  category: derived
+  criticality: A
+  rationale: 'D-39: a start shut in by the clearance (E-39 run 1, pocket in the first gallery) is not proof that goals are unreachable; 0.75 m plus the 0.43 m cell margin keeps more than 0.5 m (tools/probes/clearance_try.cpp).'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AGoalFailingFromAnEnclosedStartIsNotExcluded
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.AStartInALargeSpaceDoesNotUseTheEnclosedStartClearance
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.AnEnclosedStartEscapesThroughANarrowMouthAtTheEnclosedStartClearance
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: ITEM-D-048
+  text: Once the flown track has reached 50 m past the entrance plane, the explorer shall not select a frontier goal less than 25 m past the entrance plane.
+  category: derived
+  criticality: A
+  rationale: 'D-40: after being deep, frontiers by the mouth lead outside (cliff, valley); replay of 15 runs: such goals came only in the 4 runs that went outside (tools/probes/mouth_band.py).'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AfterBeingDeepAFrontierInTheMouthBandIsNotAGoal
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.BeforeBeingDeepTheMouthBandIsExplored
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: ITEM-D-049
+  text: When the plan to a frontier goal runs out of its expansion budget and the reached cell nearest the goal is at least 3 m from the start and at least 3 m nearer the goal, neither the goal nor that cell is more than 2 m above the start, and that cell is not within 3 m of where an earlier such approach started or ended, the explorer shall return the path to that cell, planned at the widest fallback clearance that reached such a cell, and shall not set the goal aside.
+  category: derived
+  criticality: B
+  rationale: 'D-42: in E-40 run 2 a frontier 10 m ahead in an unmapped stretch ran out of budget, was set aside, and the UAV turned back 58 m from Lantern (1); approaching lets the camera map the way.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.ABudgetFailureFliesThePartialPathTowardsTheGoal
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.APartialApproachNeverReturnsToAnEarlierApproachPoint
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.NoPartialApproachTowardsAGoalAboveTheUav
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.ABudgetFailureReturnsThePartialPathTowardsTheGoal
+  - ros2_ws/src/cave_navigation/test/test_planner.cpp::Planner.APartialApproachKeepsTheWidestClearanceThatGaveOne
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: ITEM-D-050
+  text: When a return plan is requested to a goal more than 40 m away, the path planner shall plan to the earliest point of the flown track within 40 m, earlier than the point nearest the UAV, that a plan reaches, and the mission shall request the next leg on arriving, until it is at the entrance.
+  category: derived
+  criticality: B
+  rationale: 'D-43: in E-41 run 1 all four lanterns were found at 1136 s, then 19 plans of 900 m to the entrance ran out of budget and the mission failed for no movement.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_navigation
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_a_return_leg_ending_short_of_the_entrance_is_followed_by_the_next_request
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.TheReturnGoesBackAlongTheFlownTrackInLegs
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: ITEM-D-051
+  text: The path planner shall keep every navigation-map cell that holds a depth return measured within 10 m of the camera occupied for the rest of the mission, except the cell holding the UAV and, when the UAV's start is shut in, the cells within 5 m of it that later depth measurements show free.
+  category: derived
+  criticality: A
+  rationale: 'Retired (Q-42, E-50): kept close hits boxed the UAV in until three runs failed; in two runs without them no stall and no close pass at a real surface. D-45: in runs 20261003-034624 and -053936 the UAV had passed 0.47 m from small wall features.'
+  source: null
+  parent: SYS-S-001
+  allocated_to: null
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.ACellHitFromCloseRangeStaysOccupiedWhenLaterRaysPassThroughIt
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.CloseHitsBeyondTheRadiusAreNotReleased
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.ReleasingCloseHitsFreesOnlyCellsTheDepthMapSeesFree
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.TheUavCellIsNeverKeptAsAStickyHit
+  - ros2_ws/src/cave_navigation/test/test_nav_map.cpp::NavMap.WithoutStickyHitsThePassingRaysClearTheCell
+  status: retired
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: ITEM-D-052
+  text: The explorer shall try frontier goals in openings before all other frontier goals, where an opening is a frontier bin at least 100 m past the entrance plane (300 m once the flown track has been 400 m past it), at least 8 m from and at most 10 m above the nearest point of the flown track, in which at least half of the sampled frontier cells have no occupied cell within 1 m and at most 5 % of the 1 m discs one cell beyond them are occupied.
+  category: derived
+  criticality: B
+  rationale: 'D-51 (E-48): fitted on 5094 frontier bins labelled with the union of 114 runs (precision 72 %, recall 68 %); runs 20261003-185202 and -193212 found all four lanterns and returned in 1931 s and 1651 s.'
+  source: null
+  parent: SYS-P-002
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AFrontierBesideTheFlownTrackIsNotAnOpening
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOpeningFarAboveTheFlownTrackIsNotInTheTier
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOpeningIsChosenBeforeANearerScrap
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AnOpeningNearTheEntranceIsNotInTheTier
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.OpeningsNearTheEntranceStopCountingOnceTheUavHasBeenDeep
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.TheWallBeyondAFrontierGatesAnOpening
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.WithoutTheOpeningTierANearerScrapWins
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: ITEM-D-053
+  text: While the UAV is less than 300 m past the entrance plane and within 30 m, measured horizontally, of the camera position of an outdoor view counted under ITEM-D-046, the explorer shall try frontier goals in order of their distance to the entrance point, nearest first.
+  category: derived
+  criticality: A
+  rationale: 'D-53: final-validation run 20261004-143626 left the mouth sideways into the valley; outdoor views were counted, but each new goal lay just beyond the 30 m zone of the latest view, so the UAV walked outwards goal by goal and never found a lantern.'
+  source: null
+  parent: SYS-S-001
+  allocated_to:
+  - cave_navigation
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.AUavInsideTheOutdoorZoneTakesTheGoalNearestTheEntrance
+  - ros2_ws/src/cave_navigation/test/test_explorer.cpp::Explorer.NoHomingDeeperThanTheOutdoorDepth
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: ITEM-D-054
+  text: While the mission state is WAIT_SENSORS, when 120 s have passed since the mission node's first state update without a fresh state estimate and a depth image, the mission node shall enter the state FAILED.
+  category: derived
+  criticality: A
+  rationale: 'SYS-F-029: the failure handling of SYS-F-017 to SYS-F-021 then ends the run and writes the files; 120 s as the no-movement watchdog of ITEM-D-022.'
+  source: null
+  parent: SYS-F-029
+  allocated_to:
+  - cave_mission
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_no_sensors_for_120_s_declares_failure
+  - ros2_ws/src/cave_mission/test/test_state_machine.py::test_sensors_arriving_within_120_s_start_the_mission
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I5
+- id: SYS-F-022
+  text: When the mission launch file is started, the UAV system shall open a live visualization window of the mission unless it is started with the visualization switched off.
+  category: functional
+  criticality: C
+  rationale: 'Customer request: the view starts with the simulation from the single launch file (SYS-C-004).'
+  source: 'Customer request 2026-09-30: ''a simplified visualization of the current state of the mission ... launch at the same time as the simulation ... top vision of the entire cave (only the cave) ... UAV''s current position, detected lanterns position, current goal, derived path and a light visualization of the cave points'''
+  parent: null
+  allocated_to:
+  - cave_bringup
+  - cave_viz
+  moc: demonstration
+  verified_by:
+  - evidence/I4-view-demo.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-F-023
+  text: While the mission is running, the visualization shall show a top-down view that frames every mapped point beyond the entrance plane, framed only from data sensed during the current run, and redrawn at least once per second.
+  category: functional
+  criticality: C
+  rationale: 'Customer request: a top view of the whole known cave; the approach route need not be shown. Framing from this run''s map keeps the view free of prior cave knowledge (brief 4.2).'
+  source: 'Customer request 2026-09-30: ''a simplified visualization of the current state of the mission ... launch at the same time as the simulation ... top vision of the entire cave (only the cave) ... UAV''s current position, detected lanterns position, current goal, derived path and a light visualization of the cave points'''
+  parent: null
+  allocated_to:
+  - cave_viz
+  moc: demonstration
+  verified_by:
+  - evidence/I4-view-demo.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-F-024
+  text: While the mission is running, the visualization shall show the UAV's estimated position.
+  category: functional
+  criticality: C
+  rationale: Customer request; from the corrupted state estimate (SYS-C-001).
+  source: 'Customer request 2026-09-30: ''a simplified visualization of the current state of the mission ... launch at the same time as the simulation ... top vision of the entire cave (only the cave) ... UAV''s current position, detected lanterns position, current goal, derived path and a light visualization of the cave points'''
+  parent: null
+  allocated_to:
+  - cave_viz
+  moc: demonstration
+  verified_by:
+  - evidence/I4-view-demo.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-F-025
+  text: While the mission is running, the visualization shall show the positions of the reported lanterns.
+  category: functional
+  criticality: C
+  rationale: Customer request; the same estimates as /perception/lanterns (SYS-F-010).
+  source: 'Customer request 2026-09-30: ''a simplified visualization of the current state of the mission ... launch at the same time as the simulation ... top vision of the entire cave (only the cave) ... UAV''s current position, detected lanterns position, current goal, derived path and a light visualization of the cave points'''
+  parent: null
+  allocated_to:
+  - cave_viz
+  moc: demonstration
+  verified_by:
+  - evidence/I4-view-demo.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-F-026
+  text: While the mission is running, the visualization shall show the current flight goal.
+  category: functional
+  criticality: C
+  rationale: 'Customer request (''current goal''): the exploration goal while exploring, the entrance while returning; also a debugging aid.'
+  source: 'Customer request 2026-09-30: ''a simplified visualization of the current state of the mission ... launch at the same time as the simulation ... top vision of the entire cave (only the cave) ... UAV''s current position, detected lanterns position, current goal, derived path and a light visualization of the cave points'''
+  parent: null
+  allocated_to:
+  - cave_viz
+  - cave_mission
+  moc: demonstration
+  verified_by:
+  - evidence/I4-view-demo.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-F-027
+  text: While the mission is running, the visualization shall show the path the UAV is currently flying.
+  category: functional
+  criticality: C
+  rationale: Customer request; also a debugging aid for the planner.
+  source: 'Customer request 2026-09-30: ''a simplified visualization of the current state of the mission ... launch at the same time as the simulation ... top vision of the entire cave (only the cave) ... UAV''s current position, detected lanterns position, current goal, derived path and a light visualization of the cave points'''
+  parent: null
+  allocated_to:
+  - cave_viz
+  moc: demonstration
+  verified_by:
+  - evidence/I4-view-demo.md
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-F-028
+  text: While the mission is running, the visualization shall show the mapped cave surface beyond the entrance plane as at most 150 000 points, with every occupied map voxel beyond the entrance plane within 1.0 m of a shown point, updated at least every 30 s.
+  category: functional
+  criticality: C
+  rationale: 'Customer request: light but readable. 30 min runs mapped 70 000-92 000 one-metre cells beyond the plane (runs 20260929-231456, 20260930-010745/-014732), so 150 000 leaves 1.6x margin (review N1). 30 s follows the 25 s map snapshots.'
+  source: 'Customer request 2026-09-30: ''a simplified visualization of the current state of the mission ... launch at the same time as the simulation ... top vision of the entire cave (only the cave) ... UAV''s current position, detected lanterns position, current goal, derived path and a light visualization of the cave points'''
+  parent: null
+  allocated_to:
+  - cave_perception
+  - cave_viz
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_perception/test/test_map_io.cpp::MapIo.ThinCavePointsKeepsOnePointPerMetreCellBeyondThePlaneUpToTheCap
+  - ros2_ws/src/cave_viz/test/test_render.py::test_a_cave_point_fills_its_one_metre_cell_when_the_view_is_zoomed_in
+  - ros2_ws/src/cave_viz/test/test_render.py::test_cave_points_are_drawn
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4
+- id: SYS-P-006
+  text: While the visualization is running, the depth and semantic image rates received by the mission, averaged over 30 s, shall be at least 90 % of the rates measured without the visualization on the same host.
+  category: performance
+  criticality: B
+  rationale: The view must not slow the mission (CPU rendering once dropped the cameras from 5 to 1.6 Hz, E-02); relative to the same host, as the customer's machine is not measured. SYS-P-005 acceptance runs are made with the view on.
+  source: 'Customer request 2026-09-30: ''a simplified visualization of the current state of the mission ... launch at the same time as the simulation ... top vision of the entire cave (only the cave) ... UAV''s current position, detected lanterns position, current goal, derived path and a light visualization of the cave points'''
+  parent: null
+  allocated_to:
+  - cave_viz
+  moc: test
+  verified_by:
+  - ros2_ws/src/cave_viz/test/test_viewer.py::test_a_full_150000_point_frame_renders_in_well_under_a_second
+  status: verified
+  waiver: null
+  suspect: false
+  target: null
+  threshold: null
+  increment: I4

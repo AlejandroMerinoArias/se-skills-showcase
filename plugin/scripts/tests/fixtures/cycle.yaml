@@ -1,0 +1,41 @@
+meta:
+  project: demo-project
+  mode: lite
+  levels: [SYS]
+
+requirements:
+  - id: SYS-F-001
+    text: "When A occurs, the system shall do X."
+    category: functional
+    criticality: B
+    rationale: null
+    source: null
+    parent: SYS-F-002
+    allocated_to: null
+    moc: test
+    verified_by: []
+    status: draft
+    waiver: null
+    suspect: false
+    target: null
+    threshold: null
+    history:
+      - {date: 2026-07-25, change: created, why: "initial capture"}
+
+  - id: SYS-F-002
+    text: "When B occurs, the system shall do Y."
+    category: functional
+    criticality: B
+    rationale: null
+    source: null
+    parent: SYS-F-001
+    allocated_to: null
+    moc: test
+    verified_by: []
+    status: draft
+    waiver: null
+    suspect: false
+    target: null
+    threshold: null
+    history:
+      - {date: 2026-07-25, change: created, why: "initial capture"}

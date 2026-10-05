@@ -1,0 +1,16 @@
+mode: full
+models:
+  crit_a: opus
+  crit_b: sonnet
+  crit_c: sonnet
+  architecture: opus
+research: enabled
+traceability: annotation
+test_command: "wsl.exe bash tools/run_tests.sh"
+sim_command: "wsl.exe bash tools/run_mission.sh --timeout-min 35"
+budgets:
+  review_rounds_per_phase: 2
+  customer_questions_per_gate: 5
+  customer_questions_total: 15
+  dispatches_per_increment: 8
+  agent_soft_tokens: 150000

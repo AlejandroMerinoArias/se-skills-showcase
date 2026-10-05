@@ -1,0 +1,1166 @@
+items:
+- id: Q-01
+  kind: customer_question
+  text: Does a run in which the UAV returns to the entrance within 30 minutes with fewer than four lanterns reported
+    have any value to you, compared with a run that keeps searching past 30 minutes?
+  blocks:
+  - SYS-F-012
+  owner: setup
+  status: closed
+  answer: 'No value: a run without all four lanterns fails either way; no early-return deadline wanted.'
+  evidence: null
+- id: Q-02
+  kind: customer_question
+  text: Should the lantern output list only the four cave lanterns, or also include the reference lantern at the
+    start point?
+  blocks:
+  - SYS-F-013
+  owner: setup
+  status: closed
+  answer: Only the four cave lanterns are listed; the reference lantern is excluded.
+  evidence: null
+- id: Q-03
+  kind: customer_question
+  text: Which Ubuntu version and ROS 2 distribution run on the machine where you will run and judge the system?
+  blocks:
+  - SYS-C-005
+  owner: setup
+  status: closed
+  answer: Ubuntu 24.04 with ROS 2 Jazzy.
+  evidence: null
+- id: Q-04
+  kind: customer_question
+  text: How many simulation runs must succeed, out of how many attempts, for you to accept the system?
+  blocks:
+  - SYS-P-005
+  owner: setup
+  status: closed
+  answer: At least 2 of 3 runs must succeed.
+  evidence: null
+- id: E-01
+  kind: experiment
+  text: Which camera streams does the Unity binary actually send (RGB, depth, semantic?), and what cue identifies
+    a lantern in them (semantic label, colour, brightness)?
+  blocks:
+  - SYS-F-004
+  owner: I0
+  status: closed
+  answer: Semantic camera /Quadrotor/Sensors/SemanticCamera/image_raw (320x240, 5.1 Hz) marks lanterns as RGB (255,235,4)
+    on black; depth 16UC1 mm; FOV 106x90 deg.
+  evidence: evidence/E-01.md
+- id: E-02
+  kind: experiment
+  text: Does the provided workspace build with colcon on Ubuntu 24.04 / ROS 2 Jazzy in WSL2, and does the Unity
+    binary run there with its sensor streams at usable rate (real-time factor)?
+  blocks:
+  - SYS-C-005
+  owner: I0
+  status: closed
+  answer: Builds 4/4 packages on 24.04/Jazzy; runs with GALLIUM_DRIVER=d3d12 at depth 5.1 Hz, RGB 10.3 Hz, state
+    50 Hz (3 runs); CPU rendering drops cameras to 1.6 Hz.
+  evidence: evidence/E-02.md
+- id: E-03
+  kind: experiment
+  text: Where is the cave mouth relative to the UAV start point in the state-estimate world frame, and what obstacle-free
+    waypoint route reaches it?
+  blocks:
+  - SYS-F-001
+  owner: I0
+  status: closed
+  answer: Mouth is a rock arch at x ⟨…⟩, y ⟨…⟩, z ⟨…⟩; entrance E=⟨x, y, z⟩ via ⟨x, y, z⟩,⟨x, y, z⟩;
+    reached 9/9 with 0.00 m error, no contact (D-05).
+  evidence: evidence/E-03.md
+- id: E-04
+  kind: experiment
+  text: How large does the state-estimate error (corrupted minus true position) grow over a 30-minute flight? The
+    corruptor never reads its jump_seconds parameter, so drift jumps may be disabled.
+  blocks:
+  - SYS-P-001
+  owner: I0
+  status: closed
+  answer: Static estimator error <= 0.020 m with no growth over 3 x 308 s flights; drift branch is dead code (jump_seconds
+    never read), only 5 mm white noise.
+  evidence: evidence/E-04.md
+- id: E-05 (not published)
+  kind: experiment
+  text: Can the true lantern positions be obtained (e.g. from the simulation's true-state stream or scene data)
+    so that an offline scoring tool can check SYS-P-001?
+  blocks:
+  - SYS-P-001
+  owner: I0
+  status: closed
+  answer: 'Yes: scene-file positions (UnityPy) match the sim within 0.45 m horizontally; scene origin is 1.7 m below
+    the visible lantern base (lantern about 4.5 m tall), see Q-06.'
+  evidence: evidence/E-05 (not published).md
+- id: E-06
+  kind: experiment
+  text: Can reference cave geometry be obtained (scene data in Simulation_Data, or a truth-pose mapping run used
+    only for scoring) to judge map coverage for SYS-P-004? Also measure the narrowest passage width and the depth
+    camera range and field of view (these back SYS-P-003 and the 5 m band in SYS-P-004).
+  blocks:
+  - SYS-P-004
+  - SYS-P-003
+  owner: I0
+  status: closed
+  answer: 'Yes: 19.2 M-point reference surface; 100% of flown depth points within 0.5 m of it; sampled passages
+    22-36 m wide, 16-39 m high (lantern niche 2.5 x 1.8 m).'
+  evidence: evidence/E-06.md
+- id: D-01
+  kind: design_decision
+  text: After four lanterns are found, return immediately or keep mapping first? (re-triaged from a customer question
+    in review round 1)
+  blocks:
+  - SYS-F-006
+  - SYS-P-004
+  owner: setup
+  status: closed
+  answer: Return immediately; brief 1.1 asks for 'as fast as possible' and map quality is judged on the flown path
+    only. See architecture.md D-01.
+  evidence: null
+- id: E-07
+  kind: experiment
+  text: Does the stack run on wall-clock time or on a simulation /clock, and how do the two relate during a run?
+    This decides which clock the timing requirements use.
+  blocks:
+  - SYS-P-002
+  - SYS-F-002
+  owner: I0
+  status: closed
+  answer: 'Wall-clock time: stamps are ROS system time, no /clock, RTF 1.001 (3 runs); timing requirements use wall
+    seconds.'
+  evidence: evidence/E-07.md
+- id: E-08
+  kind: experiment
+  text: Can UAV contact with the cave surface be detected in a run (e.g. from discontinuities in true-state velocity),
+    so that SYS-S-001 can be checked?
+  blocks:
+  - SYS-S-001
+  owner: I0
+  status: closed
+  answer: Yes, offline via tracking error |p_true - p_setpoint| > 1.0 m (7.82 m on contact flight vs <= 0.26 m on
+    5 clean flights); accel spikes unusable.
+  evidence: evidence/E-08.md
+- id: E-09
+  kind: experiment
+  text: At what rate does /current_state_est publish, and what is the largest gap between messages during a run?
+  blocks:
+  - SYS-S-002
+  owner: I0
+  status: closed
+  answer: 50.0 Hz, largest gap 43 ms (3 runs x 30 s, GPU rendering); SYS-S-002's 0.5 s threshold is 12x that gap.
+  evidence: evidence/E-09.md
+- id: Q-06
+  kind: customer_question
+  text: 'Each lantern is an object about 4.5 m tall. When you check that a reported lantern is ''within 2 m of the
+    true lantern position'', which point is the true position: the centre of the visible lantern, or the simulator''s
+    internal object origin (which for the reference lantern lies about 1.7 m below its visible bottom)?'
+  blocks:
+  - SYS-P-001
+  owner: I0
+  status: closed
+  answer: The true position is the centre of the visible lantern.
+  evidence: null
+- id: E-10 (not published)
+  kind: experiment
+  text: For each of the four cave lanterns, where is the centre of its visible (semantic) pixels, back-projected
+    with the true pose, relative to its scene-file origin? (Gives the scoring truth for SYS-P-001.)
+  blocks:
+  - SYS-P-001
+  owner: I3
+  status: closed
+  answer: "Visible centre = scene origin + ⟨x, y, z⟩ m (\xB10.1 m in z; 2 lanterns x 3 runs; one prefab transform\
+    \ for all five): the scoring truth for SYS-P-001."
+  evidence: evidence/E-10 (not published).md
+- id: E-11
+  kind: experiment
+  text: Does the presence of /dev/dxg distinguish a WSL2 host with GPU passthrough from a native Ubuntu host (where
+    it must be absent)?
+  blocks:
+  - ITEM-D-008
+  owner: I1
+  status: closed
+  answer: 'Yes: /dev/dxg present on the WSL2 kernel with dxgkrnl (3/3); dxgkrnl is WSL-only (not mainline), so absent
+    on native Ubuntu; ITEM-D-008 stands.'
+  evidence: evidence/E-11.md
+- id: E-12
+  kind: experiment
+  text: Inside the dark cave, do the four cave lanterns still appear in the semantic image as pure (255,235,4) pixels,
+    and from what range?
+  blocks:
+  - SYS-F-004
+  owner: I3
+  status: closed
+  answer: 'Yes: only exact (255,235,4) pixels in the dark cave (0 impure of 329 549, 3 runs); detected in 100 %
+    of in-view frames to 50 m, about 70 % at 50-60 m, none by 90 m; 3D limited to about 50 m by the depth range.'
+  evidence: evidence/E-12.md
+- id: E-13
+  kind: experiment
+  text: During a mapping flight, what fraction of depth-derived point clouds does octomap_server fail to insert
+    (dropped or delayed > 1 s)?
+  blocks:
+  - ITEM-D-005
+  owner: I1
+  status: closed
+  answer: octomap_server inserts only 26-48 % of clouds in flight (100 % at rest); D-08 reversed, replaced by our
+    own mapper (D-12).
+  evidence: evidence/E-13.md
+- id: Q-07
+  kind: customer_question
+  text: 'Do you approve these two design-level restatements of your ''never the true pose'' constraint for I1? (a)
+    ITEM-D-001: cameras are attached to the estimated body frame, and none of the provided truth-attached transforms
+    are started; (b) ITEM-D-010: the mission, planning and perception nodes read the UAV position only from the
+    corrupted state estimate.'
+  blocks:
+  - ITEM-D-001
+  - ITEM-D-010
+  owner: I1
+  status: closed
+  answer: Customer approves ITEM-D-001 and ITEM-D-010.
+  evidence: null
+- id: E-15
+  kind: experiment
+  text: Is there enough clearance at the entrance point and through the mouth for the I2 planner (1.5 m) to return
+    to within 1.0 m of E and to enter the gallery?
+  blocks:
+  - ITEM-D-016
+  - SYS-F-006
+  owner: I2
+  status: closed
+  answer: E has 6.58 m clearance (return feasible); the mouth narrows to 1.15 m on the flown line, so D-14 falls
+    back to 1.0 m and ITEM-D-016's minimum is 1.0 m.
+  evidence: evidence/E-15.md
+- id: Q-08
+  kind: customer_question
+  text: 'Do you approve the I2 critical design statements: ITEM-D-013 (exploration goals only from frontiers of
+    the map built this run, beyond the entrance plane), ITEM-D-014 (in EXPLORE only planner-generated paths are
+    flown), ITEM-D-016 (paths only through known-free space, at least 1.0 m from walls)?'
+  blocks:
+  - ITEM-D-013
+  - ITEM-D-014
+  - ITEM-D-016
+  owner: I2
+  status: closed
+  answer: Customer approves ITEM-D-013, ITEM-D-014 and ITEM-D-016.
+  evidence: null
+- id: E-16
+  kind: experiment
+  text: Can every path point keep 1.0 m clearance (ITEM-D-016) when the UAV itself is closer than that to a voxel
+    observed after it arrived?
+  blocks:
+  - ITEM-D-016
+  owner: I2
+  status: closed
+  answer: 'No: without an allowance near the start, 70-95 % of plans failed at the start and RETURN never planned
+    (2/2 runs); ITEM-D-016 needs a bounded exception near a blocked start.'
+  evidence: evidence/E-16.md
+- id: Q-09
+  kind: customer_question
+  text: 'Do you approve the amended ITEM-D-016: paths keep at least 1.0 m from walls, except within 1.5 m of a start
+    where the UAV is already closer than 1.0 m (because rock was seen only after arriving); there the path may only
+    move away and never gets closer to any wall than the UAV already is?'
+  blocks:
+  - ITEM-D-016
+  owner: I2
+  status: closed
+  answer: Customer approves the amended ITEM-D-016 (escape zone near a start already inside the clearance).
+  evidence: null
+- id: Q-10
+  kind: customer_question
+  text: 'For your 2-minute no-movement failure: (a) is ''does not move'' correctly read as ''the estimated position
+    stays within 1.0 m of where it was, for any 120 s stretch between take-off and arriving back at the entrance''?
+    (b) Should time the UAV deliberately hovers (waiting for state estimates to resume, or while no safe path to
+    any goal is found) count toward the 2 minutes, or be excluded? (c) After the failure is declared, the UAV stops
+    taking new goals and hovers where it is, writes both files and reports the failure. Is that what you want?'
+  blocks:
+  - SYS-F-016
+  - SYS-F-017
+  owner: I2
+  status: closed
+  answer: (a) yes, 1.0 m over any 120 s from take-off to return; (b) deliberate holds count; (c) see Q-11.
+  evidence: null
+- id: Q-11
+  kind: customer_question
+  text: 'Review round 2 (cap reached) left two conflicts for you to settle. Proposed resolutions: (1) a failure
+    declared during the approach also stops the predefined route: SYS-F-017 takes precedence over SYS-F-001, SYS-F-006
+    and SYS-S-003, and the failed state lasts until the run ends; (2) the failure is declared once: SYS-F-016 triggers
+    ''the first time'' the condition holds, and its window ends when the UAV comes within 1.0 m of the entrance
+    after four lanterns have been reported (not on a pass near the mouth while exploring). Approve?'
+  blocks:
+  - SYS-F-016
+  - SYS-F-017
+  owner: I2
+  status: closed
+  answer: A declared failure ends the run immediately (files written, failure reported); it exists to avoid waiting
+    30 min on an inoperative UAV. Window ends at the return after four lanterns.
+  evidence: null
+- id: Q-12
+  kind: customer_question
+  text: 'Do you approve the critical design statements for the no-movement failure: ITEM-D-022 (1 Hz position watch,
+    failure declared within 2 s of a 120 s stretch within 1.0 m), ITEM-D-023 (after failure no more paths; exit
+    once the map is written or after 8 s), ITEM-D-024 (the launch file stops every process when the mission node
+    exits), ITEM-D-025 (the mapper writes the map files on failure)?'
+  blocks:
+  - ITEM-D-022
+  - ITEM-D-023
+  - ITEM-D-024
+  - ITEM-D-025
+  owner: I2
+  status: closed
+  answer: Customer approves ITEM-D-022..025.
+  evidence: null
+- id: E-17
+  kind: experiment
+  text: Does ITEM-D-022's state list (TAKEOFF..RETURN) cover every window SYS-F-016 watches?
+  blocks:
+  - ITEM-D-022
+  owner: I2
+  status: closed
+  answer: 'No: a HOLD reached with fewer than four lanterns is unwatched, and RETURN at the entrance with four lanterns
+    is watched; the scope must be the parent''s window.'
+  evidence: evidence/E-17.md
+- id: Q-13
+  kind: customer_question
+  text: 'Do you approve the corrected ITEM-D-022: the 2-minute no-movement watch runs from take-off until the UAV
+    is back at the entrance with four lanterns reported (so a UAV that returns with fewer lanterns and just hovers
+    is also declared failed), instead of stopping at any final hover?'
+  blocks:
+  - ITEM-D-022
+  owner: I2
+  status: closed
+  answer: Customer approves the corrected ITEM-D-022 (watch until back at the entrance with four lanterns).
+  evidence: null
+- id: Q-14
+  kind: customer_question
+  text: Do you approve the double-reviewed I2 implementation of the critical requirements SYS-C-002, SYS-F-006,
+    SYS-S-001, ITEM-D-013, ITEM-D-014, ITEM-D-016, SYS-F-016, SYS-F-017, SYS-F-018, SYS-F-019, SYS-F-020, ITEM-D-023,
+    ITEM-D-024, ITEM-D-025 (unit 105/105; nominal sim runs 25/25 twice; failure sim run 8/8)?
+  blocks:
+  - SYS-C-002
+  - SYS-F-006
+  - SYS-S-001
+  - ITEM-D-013
+  - ITEM-D-014
+  - ITEM-D-016
+  - SYS-F-016
+  - SYS-F-017
+  - SYS-F-018
+  - SYS-F-019
+  - SYS-F-020
+  - ITEM-D-023
+  - ITEM-D-024
+  - ITEM-D-025
+  owner: I2
+  status: closed
+  answer: Customer approves the I2 implementation of the listed CRIT-A requirements.
+  evidence: null
+- id: Q-15
+  kind: customer_question
+  text: Do you approve the implementation of the corrected ITEM-D-022?
+  blocks:
+  - ITEM-D-022
+  owner: I2
+  status: closed
+  answer: Customer approves the ITEM-D-022 implementation.
+  evidence: null
+- id: E-18
+  kind: experiment
+  text: Is the tunnel system holding Lantern, Lantern (1) and Lantern (2) connected to the gallery by a passage
+    a UAV can fly (at least 2 m clearance), and where? The reference surfaces alone show no inside connection even
+    at 1 m clearance (E-10 (not published) route probe); parts of the shell are closed only by the Unity terrain, which covers x
+    from -500 m eastwards.
+  blocks:
+  - SYS-P-005
+  owner: I4
+  status: closed
+  answer: Connected via (-698,-60) (11/18 runs); current exploration does not reach Lantern (2) or Lantern in 30
+    min (heads west, dithers in the far corner; Lantern 45-60 m deeper than flown); a southern branch near the mouth
+    leads out of the cave (3/18). I4 must change the exploration strategy.
+  evidence: evidence/E-18.md
+- id: Q-16
+  kind: customer_question
+  text: 'Do you approve the I3 critical design statements? ITEM-D-026: a lantern sighting is a blob of exact lantern
+    colour with depth, at most 45 m away, counted only after the entrance. ITEM-D-027: the position is estimated
+    from all sightings'' 3D points, the nearest kept first (0.43 m error with near views, at most 1.5 m from far
+    views only; your limit is 2 m). ITEM-D-028: sightings within 8 m belong to the same lantern, and a lantern is
+    reported after 3 sightings; if two reported lanterns turn out to be one, the earlier one survives with both
+    lanterns'' data (review round 2 conflict B3). ITEM-D-029: only lanterns beyond the entrance plane are reported,
+    so the start lantern is excluded.'
+  blocks:
+  - ITEM-D-026
+  - ITEM-D-027
+  - ITEM-D-028
+  - ITEM-D-029
+  owner: I3
+  status: closed
+  answer: Customer approves ITEM-D-026..029 with the D-20 merge rule.
+  evidence: null
+- id: E-19 (not published)
+  kind: experiment
+  text: Does the I2 exploration keep the UAV clear of the cave surface on long (10+ min) flights? (SYS-S-001 was
+    verified on 150 s explorations only.)
+  blocks:
+  - SYS-S-001
+  owner: I3
+  status: closed
+  answer: 'No: in a 9.7 min run the explorer climbed to z 51.8 m (37 m above E), above the terrain over the cave
+    mesh whose back faces the camera cannot see, and touched the surface; all incidents were more than 20 m above
+    E, no goal at or below 33 m had one.'
+  evidence: evidence/E-19 (not published).md
+- id: Q-17
+  kind: customer_question
+  text: 'A 10-minute exploration run touched the cave (SYS-S-001 violated): the UAV climbed 37 m above the entrance,
+    where the camera cannot map what is above and below it. Do you approve the new critical design statement ITEM-D-031:
+    planned paths never go more than 20 m above the cave entrance? All lanterns and every region the missions have
+    used so far lie below that height. (Over the question budget because a CRIT-A child requirement needs the customer''s
+    approval; it is neither an experiment nor a design decision.)'
+  blocks:
+  - ITEM-D-031
+  owner: I3
+  status: closed
+  answer: 'Customer rejects a fixed ceiling and approves the revised ITEM-D-031: only camera-revealable (horizontal)
+    frontiers, vertical travel weighted 3x.'
+  evidence: evidence/E-19 (not published).md
+- id: Q-18
+  kind: customer_question
+  text: 'Contact with simulator surfaces that are invisible from one side (1 of 5 long runs): (A) build bump detection,
+    obstacle marking, replanning and an in-flight path re-check, then decide acceptance on the measured rate; (B)
+    accept now.'
+  blocks:
+  - ITEM-D-032
+  - ITEM-D-033
+  owner: I3
+  status: closed
+  answer: Customer chose A (then decide on the measured contact rate).
+  evidence: evidence/E-19 (not published).md
+- id: Q-19
+  kind: customer_question
+  text: How should SYS-S-001 be judged given simulator objects the depth camera cannot see; and do you approve the
+    I3 deviations (2 m minimum sighting range; in-flight check only for obstacles mapped after planning)?
+  blocks:
+  - SYS-S-001
+  - ITEM-D-026
+  - ITEM-D-033
+  owner: I3
+  status: closed
+  answer: 'Visible surfaces only: no contact with surfaces the camera can see; brief contact with invisible objects
+    is acceptable if the UAV recovers and continues (SYS-S-004). Both deviations approved.'
+  evidence: evidence/E-19 (not published).md
+- id: Q-20
+  kind: customer_question
+  text: Do you approve the I3 implementation of its CRIT-A requirements?
+  blocks:
+  - SYS-F-004
+  - SYS-P-001
+  owner: I3
+  status: closed
+  answer: Customer approves the I3 CRIT-A implementation and signs off evidence/I3-inspection.md.
+  evidence: evidence/I3-inspection.md
+- id: E-20
+  kind: experiment
+  text: Can sensed data tell exploration goals outside the cave (a branch near the mouth leads outdoors, 3/18 runs)
+    from goals inside it?
+  blocks:
+  - SYS-P-005
+  owner: I4
+  status: closed
+  answer: 'Yes: sky-evidence fraction in a cylinder above the point (R 8 m, 5-45 m up) is >= 0.187 outdoors and
+    <= 0.101 in the gallery; threshold 0.15 separates them (one probe flight).'
+  evidence: evidence/E-20.md
+- id: E-21
+  kind: experiment
+  text: Where does exploration time go, and what pace does a four-lantern mission within 1800 s need?
+  blocks:
+  - SYS-P-002
+  owner: I4
+  status: closed
+  answer: Stationary 26-30 % (planning 11-13 %), moving 1.64-1.76 m/s, pace 1.14-1.30 m/s; the about 2400 m tour
+    needs about 1.6 m/s.
+  evidence: evidence/E-21.md
+- id: Q-21
+  kind: customer_question
+  text: 'Do you approve the I4 critical design statement ITEM-D-035 (outdoor frontiers, whose sky evidence fills
+    at least 15 % of a cylinder above them, are not exploration goals), and the resolution of review conflict N1:
+    corners are rounded by arcs that stay within 0.25 m of the planned path, flown at a speed the acceleration limit
+    allows (ITEM-D-040)?'
+  blocks:
+  - ITEM-D-035
+  - ITEM-D-040
+  owner: I4
+  status: closed
+  answer: Customer approves ITEM-D-035 and the arc-corner resolution (ITEM-D-040).
+  evidence: evidence/E-20.md
+- id: Q-22
+  kind: customer_question
+  text: Should the visualization always open with the mission, or open by default with a launch option to switch
+    it off (for example on a machine without a display, or for judging runs)?
+  blocks:
+  - SYS-F-022
+  owner: I4
+  status: closed
+  answer: Open by default, with a launch option to switch it off; requirements validated.
+  evidence: null
+- id: E-22
+  kind: experiment
+  text: With the mission view on, is every 30 s average of the depth and semantic frame rates during the first
+    300 s in the cave at least 90 % of the mean rate with the view off (3 alternating pairs of 7 min runs)?
+  blocks:
+  - SYS-P-006
+  owner: I4
+  status: closed
+  answer: 'Yes: lowest 30 s window with the view on 5.03 Hz for both cameras, 98 % of 5.11 Hz with it off (3 pairs).'
+  evidence: evidence/E-22.md
+- id: E-23
+  kind: experiment
+  text: Is the map voxel that stood 0.63 m from the UAV in run 20260930-023723 a surface, and how common are such
+    lone voxels?
+  blocks:
+  - ITEM-D-041
+  owner: I4
+  status: closed
+  answer: 'No: nothing else in the map within 2 m of it and the reference surface is over 2 m away. Lone voxels
+    (no other within 1 m) are 153-197 per run, 90-145 of them over 2 m from the surface (0.009-0.013 % of cells).'
+  evidence: evidence/E-23.md
+- id: E-24
+  kind: experiment
+  text: Where did the exploration time of run 20260930-023723 go after Lantern (2), and why were Lantern and
+    Lantern (1) not reached?
+  blocks:
+  - ITEM-D-036
+  owner: I4
+  status: closed
+  answer: 'From 1200 s the explorer followed frontier goals 8-11 m above its own track (z 18-25 over a track at z
+    9-14), 500 m back towards the entrance; 3632 frontier bins were left at the end, at every height.'
+  evidence: evidence/E-24.md
+- id: E-25
+  kind: experiment
+  text: 'Validation of ITEM-D-042 and ITEM-D-043 after the I4 design review cap: over the next full runs, is the time spent on goals
+    above or below the flown track lower than in run 20260930-023723 (480 s), and is no lantern found only in a
+    deferred leftover?'
+  blocks:
+  - ITEM-D-042
+  - ITEM-D-043
+  owner: I4
+  status: closed
+  answer: 'ITEM-D-043: goals within 6 m of an earlier goal 0 % of goal time in 6 runs (7-36 % before). ITEM-D-042: no
+    deferred goal chosen in 5 runs and no lantern found only in a deferred leftover; the ceiling backtrack of run
+    20260930-023723 did not recur. Both validated.'
+  evidence: evidence/E-26.md
+- id: Q-23
+  kind: customer_question
+  text: 'The delivered cave map now leaves out lone voxels: an occupied voxel with no other one within 1.0 m. There
+    are 90-145 of them per run (0.01 % of the map), and each is more than 2 m from the real cave surface: depth noise
+    in open air (E-23). One of them, 0.63 m from the UAV, made the "never within 0.5 m of a surface the camera saw"
+    check fail, with the real surface over 2 m away. With them removed, that check is judged against the cleaned
+    map. Do you accept this (ITEM-D-041)?'
+  blocks:
+  - ITEM-D-041
+  owner: I4
+  status: closed
+  answer: Customer accepts the removal of lone voxels (ITEM-D-041); the surface check uses the cleaned map.
+  evidence: evidence/E-23.md
+- id: E-26
+  kind: experiment
+  text: How much exploration time goes to goals near earlier goals (revisits)?
+  blocks:
+  - ITEM-D-043
+  owner: I4
+  status: closed
+  answer: 'Within 6 m of an earlier goal: 7 %, 11 % and 29 % of the goal time in three runs; none within 2 m (the old
+    exclusion radius).'
+  evidence: evidence/E-26.md
+- id: E-27
+  kind: experiment
+  text: With descents weighted 1 instead of 3 in the explorer ranking (climbs stay 3), does a 30 min run reach the
+    tunnel east of the western junction (z about -30) and Lantern, and does it keep clear of the problems D-24 fixed
+    (no climbing out, SYS-S-001)? Evidence for a proposed change to ITEM-D-031 (customer-approved, CRIT-A).
+  blocks:
+  - ITEM-D-031
+  owner: I4
+  status: closed
+  answer: 'Yes, in one run: z ⟨…⟩, Lantern reported (0.4 m error) for the first time in 9 I4 runs; 3 lanterns;
+    safety tests passed. The south branch was cut short (Lantern (2) missed).'
+  evidence: evidence/E-27.md
+- id: Q-24
+  kind: customer_question
+  text: 'ITEM-D-031 (you approved it in Q-17) weights vertical travel 3x in the explorer''s goal ranking, to stop
+    climbing out through the roof. It also makes going down 3x costly, and the fourth lantern (Lantern) sits about
+    85 m below the tunnels: in 8 runs the UAV never got closer than 80 m. In one run with descents weighted 1 (climbs
+    kept at 3) it went down to z ⟨…⟩ and reported Lantern for the first time, with all safety tests passing (E-27).
+    Do you approve changing ITEM-D-031 to weight climbs 3x and descents 1x?'
+  blocks:
+  - ITEM-D-031
+  owner: I4
+  status: closed
+  answer: 'Customer approves: climbs weighted 3x, descents 1x (ITEM-D-031 revised).'
+  evidence: evidence/E-27.md
+- id: E-28
+  kind: experiment
+  text: Why did run 20260930-155149 stop at 435 s, and would a larger escape zone (ITEM-D-016) have freed it?
+  blocks:
+  - ITEM-D-016
+  owner: I4
+  status: closed
+  answer: 'Corner trap: arrived 0.87 m above a floor mapped on arrival, unknown 1.5 m above; nearest full-clearance
+    cell about 3.5 m away. Replanned on the run''s map: 1.5 m escape zone StartBlocked, 3 m finds a path.'
+  evidence: evidence/E-28.md
+- id: Q-25
+  kind: customer_question
+  text: 'ITEM-D-016 (critical, already approved) lets a path start inside the 1.0 m wall clearance only within
+    1.5 m of the start, and never closer to anything than the start. One run ended with the no-movement failure
+    because the UAV arrived 0.87 m above a floor that was mapped only on arrival, and the nearest cell with full
+    clearance was about 3.5 m away. Replaying that map with the planner, a 3 m escape zone frees it; the rule that the
+    path never gets closer to anything than the start stays (E-28). Do you approve changing 1.5 m to 3 m in ITEM-D-016?'
+  blocks:
+  - ITEM-D-016
+  owner: I4
+  status: closed
+  answer: Customer approves a 3 m escape zone in ITEM-D-016.
+  evidence: evidence/E-28.md
+- id: E-29
+  kind: experiment
+  text: With a heading term in the explorer ranking (turning back from the flown heading costs up to 1x the
+    horizontal distance), does the UAV cross the first gallery faster and find more lanterns in 30 min?
+  blocks:
+  - ITEM-D-036
+  owner: I4
+  status: closed
+  answer: 'Inconclusive, not adopted: tunnel entry 292 s and no valley detour, but Lantern (3) passed unseen and
+    480 s of end-to-end back-and-forth; 2 lanterns (one run).'
+  evidence: evidence/E-29.md
+- id: E-30
+  kind: experiment
+  text: What made the lantern node report a false lantern 9-13 m beyond Lantern (3) along the line of sight in run
+    20260930-160934 (UAV approaching from the west at 7-16 m)?
+  blocks:
+  - ITEM-D-028
+  owner: I4
+  status: closed
+  answer: 'The reference lantern 280 m away, seen as 3-4 pixels with the depth of nearer scenery (bearings match to
+    0.2 deg). From 8 m out, pixels x range^2 >= 2000 rejects every false blob and 1 of 2330 true frames.'
+  evidence: evidence/E-30.md
+- id: Q-26
+  kind: customer_question
+  text: 'I4 verification failed: SYS-P-002 (four lanterns and back within 1800 s) was met in 0 of 3 acceptance runs
+    (3, 0, 3 lanterns), so SYS-P-005 is not met; SYS-P-004 was met in 2 of 3. Re-plan I4 (continue with the known
+    causes: the outdoor valley detour, branch order, lanterns passed at a distance, the open false-lantern case E-30),
+    or fail I4 and move on to final validation?'
+  blocks:
+  - SYS-P-002
+  - SYS-P-005
+  owner: I4
+  status: closed
+  answer: 'Customer: re-plan I4 (outdoor valley, branch order, lanterns passed at a distance, false lantern E-30).'
+  evidence: evidence/I4-acceptance.md
+- id: E-31
+  kind: experiment
+  text: Does the no-return fraction of the upward-looking depth rows separate the open valley south of the mouth
+    from the cave early enough to keep the explorer out of it, and does ITEM-D-044 keep mission runs out of the valley
+    without excluding cave frontiers?
+  blocks:
+  - ITEM-D-044
+  owner: I4
+  status: closed
+  answer: 'Valley flagged at its opening (99 % of valley frames), 0 of 9508 cave frames; 2 of 2 mission runs with
+    ITEM-D-044 stayed out of the valley (3 and 2 lanterns, 11/12 tests).'
+  evidence: evidence/E-31.md
+- id: Q-27
+  kind: customer_question
+  text: 'New critical design statement ITEM-D-044 (re-plan item 1, outdoor valley): when the depth camera''s
+    upward-looking rows see open sky for 2 s, 10 m or more inside the cave mouth, frontier goals inside that camera
+    view (45 m, its field of view) are treated as outdoors and not explored. It flagged the valley at its opening and
+    no cave frame, and 2 of 2 runs with it stayed out of the valley (E-31). Do you approve it?'
+  blocks:
+  - ITEM-D-044
+  owner: I4
+  status: closed
+  answer: Customer approves ITEM-D-044 (outdoor views from the upward depth rows).
+  evidence: evidence/E-31.md
+- id: E-32
+  kind: experiment
+  text: 'The UAV flies 820-1160 m in the 390 m first gallery (2-3x its length, 470-640 s) chasing side frontiers,
+    while re-flying only 4-10 % of its track. With a ranking bonus per bin of a goal''s connected frontier region
+    (a passage face is large, a wall pocket small), does it cross the gallery faster and reach more lanterns?'
+  blocks:
+  - ITEM-D-036
+  owner: I4
+  status: closed
+  answer: 'Not adopted (one run, region weight 5): the gallery took 1146 m / 605 s (818-949 m before); the bonus pulled
+    the UAV towards the large frontier at the valley opening; 3 lanterns, coverage 89 %.'
+  evidence: null
+- id: E-33
+  kind: experiment
+  text: 'With the commanded speed limit raised from 3 to 4 m/s (ITEM-D-017), does the UAV explore faster (moving
+    speed, lanterns in 30 min) while keeping the safety criteria: tracking error <= 1.0 m outside bumps, no approach
+    within 0.5 m of a mapped surface, bump recovery?'
+  blocks:
+  - ITEM-D-017
+  owner: I4
+  status: closed
+  answer: 'Adopted: at 4 m/s, moving speed 2.39-2.41 m/s (+10 %), no bump and all safety tests passing in 2 runs.'
+  evidence: evidence/E-33.md
+- id: E-34
+  kind: experiment
+  text: With frontier regions tiered (regions of at least 6 bins, passage faces, tried before smaller ones, pockets),
+    does the UAV cross the first gallery faster (under 500-800 s and 820-1160 m) without missing lanterns, and find
+    more lanterns in 30 min?
+  blocks:
+  - ITEM-D-036
+  owner: I4
+  status: closed
+  answer: 'Not adopted (default off). With its guards (no first tier more than 10 m above the UAV; outdoor views only
+    through known-free space), 4 runs gave 3, 3, 2 and 2 lanterns, as without it. Before the guards it sent the UAV
+    up over the mouth and ended 2 runs at 3 min (findings fixed: ITEM-D-044 revision, Q-28).'
+  evidence: null
+- id: E-36
+  kind: experiment
+  text: With passage following (D-37, --passage-mode true), do 3 full runs find on average at least 0.5 lanterns more
+    than the recent default runs (2-3), leave the first gallery sooner than 470-700 s, and keep every safety test
+    passing?
+  blocks:
+  - ITEM-D-045
+  owner: I4
+  status: closed
+  answer: 'Not adopted (default off). 3, 3 and 2 lanterns (mean 2.67) against 2.75 for the default; first gallery left
+    at 352-508 s against 199-307 s. The anchor rule makes the region beside the UAV the most recent one: in run 3 it
+    led the UAV back along the gallery to the mouth. No new safety-test failure.'
+  evidence: evidence/E-36.md
+- id: E-37
+  kind: experiment
+  text: Why does explore planning take 29-31 % of the exploration time in the latest runs (14-23 % in the first runs of
+    2026-10-02), with a goal whose plan runs out of budget at all three clearances costing 10-30 s (60000 expansions
+    each)? Candidates are the exact escape-zone check (ITEM-D-016) and the failed higher clearances tried before 1.0 m.
+  blocks:
+  - ITEM-D-039
+  owner: I4
+  status: closed
+  answer: 'The exact escape-zone check (67170ee) re-scanned about 2200 cells around every segment inside the zone;
+    gathered once per plan now (fdf5ed6): same paths, explore planning 21 % in run 20261002-165606, no request over
+    10 s, pace 1.75 m/s.'
+  evidence: evidence/E-37.md
+- id: E-38
+  kind: experiment
+  text: What delays the 1 Hz lantern publication by up to 2.15 s (39-58 gaps over 1.2 s per run in the E-36 runs, 11 in
+    run 20261002-035915, none in run 20261002-024520)? Only about one gap in five falls during an explore plan, and
+    the RGB frame rate at the lantern node is steady (43-53 per 10 s). Still 53 gaps after E-37 (run
+    20261002-165606). Host load, other programs were running on the PC during the afternoon runs (a game since
+    16:45, 32 % CPU with no simulation running); a gap of about 2 s is one missed 1 s timer tick. Probe
+    (I4-acceptance-2) shows the depth frames stop for 0.7-1.0 s every 32.7-33.2 s while WSL processes keep running;
+    shorter with Chrome closed, still present with Discord open; none in the runs before 2026-10-02 03:59.
+  blocks:
+  - ITEM-D-030
+  owner: I4
+  status: closed
+  answer: 'A periodic stall of the simulator sensor output, about 1 s every 33 s, from the host since 2026-10-02 03:59 (same UAV software before and after; WSL processes keep running; shorter with Chrome closed). Run 20261002-200007 passed the publication test.'
+  evidence: evidence/E-38.md
+- id: Q-28
+  kind: customer_question
+  text: 'Two critical changes for approval. (1) ITEM-D-026, false lanterns (E-30): the reference lantern near the
+    take-off point, 280 m away, was reported as two lanterns in the valley next to the cave mouth, because its few
+    pixels took the depth of nearer scenery. New rule: from 8 m out, a lantern blob must be big enough for a lantern
+    at its depth (pixels x range^2 >= 2000); this rejects every false case and 1 of 2330 true frames. (2) ITEM-D-044,
+    outdoor views: a view taken from outside, above the mouth, excluded every cave frontier behind the rock and ended
+    two runs after 3 min; now only frontiers the camera saw through known-free space are excluded. Approve both?'
+  blocks:
+  - ITEM-D-026
+  - ITEM-D-044
+  owner: I4
+  status: closed
+  answer: Customer approves both (ITEM-D-026 size rule, ITEM-D-044 line of sight).
+  evidence: evidence/E-30.md
+- id: E-35
+  kind: experiment
+  text: 'What paused the trajectory node''s set-point stream for 0.5-0.65 s every 32.8 s from 84 s after the entrance in
+    run 20261002-035915 (35 false bumps; once in run 20261002-032112; never before)? The simulator ran at real time,
+    and the streamer''s own calls take at most 18 ms over 250 joined paths (tools/probes/streamer_timing.py).'
+  blocks:
+  - ITEM-D-032
+  owner: I4
+  status: closed
+  answer: 'The same host-side simulator stall as E-38 (period 32.7-33.2 s, from the first affected run 20261002-035915).'
+  evidence: evidence/E-38.md
+- id: E-39
+  kind: experiment
+  text: With the outdoor zone (D-38, 20 m), do full runs stay out of the valley south of the mouth without losing a cave
+    frontier needed for a lantern?
+  blocks:
+  - ITEM-D-046
+  owner: I5
+  status: closed
+  answer: 'Yes with D-38 and D-40: two runs, no valley goal, no approach within 0.5 m, safety tests pass; no lantern frontier lost. D-38 alone let the UAV chase the cliff by the mouth (closed by D-40).'
+  evidence: evidence/E-39.md
+- id: Q-29
+  kind: customer_question
+  text: 'Critical safety change for approval (ITEM-D-046). In acceptance run 2 the UAV spent most of the run in the open
+    valley outside the cave and came within 0.5 m of the terrain there, although it had recognised open sky above it
+    711 times. New rule - any spot within 20 m of a place where the UAV saw open sky is treated as outdoors and is
+    never chosen as an exploration goal. Replayed on 14 recorded runs it would have blocked the first steps into the
+    valley; in normal runs it blocks only a few goals near or above the cave mouth. Approve?'
+  blocks:
+  - ITEM-D-046
+  owner: I5
+  status: closed
+  answer: Customer approves ITEM-D-046 (outdoor zone, 20 m).
+  evidence: null
+- id: Q-30
+  kind: customer_question
+  text: 'Critical change for approval (ITEM-D-047). In the first E-39 run the UAV flew into a small pocket of the first
+    gallery and could not plan its way out; the mission failed after it stood still for 2 minutes. The opening was
+    still 1.1 m clear of the rock, but the planner keeps 1 m plus a margin for its 0.5 m map cells. New rule - only
+    when the UAV is shut in like this, it may plan with 0.75 m (plus the same margin, so still more than the 0.5 m
+    no-contact criterion). Approve?'
+  blocks:
+  - ITEM-D-047
+  owner: I5
+  status: closed
+  answer: Customer approves ITEM-D-047 (0.75 m for a shut-in start).
+  evidence: null
+- id: Q-31
+  kind: customer_question
+  text: 'Critical safety change for approval (ITEM-D-048). In the first E-39 run the outdoor-zone rule kept the UAV out
+    of the valley, but after 15 min it came back to the cave mouth and chased openings on the cliff outside it, up to
+    37 m high. New rule - once the UAV has been 50 m inside the cave, it never again chooses a goal less than 15 m
+    inside the entrance. In 15 recorded runs such goals appeared only in the 4 runs that went outside. Approve?'
+  blocks:
+  - ITEM-D-048
+  owner: I5
+  status: closed
+  answer: Customer approves ITEM-D-048 (mouth band, 15 m once 50 m in).
+  evidence: null
+- id: Q-32
+  kind: customer_question
+  text: 'The UAV now flies safely (no valley, no contacts) but finds 2-3 lanterns in 30 min and never returns.
+    Reaching 4 lanterns and the return (SYS-P-002) needs large further work with an uncertain outcome. Aim of I5 -
+    keep pushing for 4 and the return, do the cheaper speed work and then accept, or accept now?'
+  blocks:
+  - SYS-P-002
+  owner: I5
+  status: closed
+  answer: 'Customer: keep pushing for 4 lanterns and the return (flight speed and exploration order).'
+  evidence: evidence/E-39.md
+- id: E-40
+  kind: experiment
+  text: Where does the exploration time go below cruise speed, and which changes recover it safely? Baseline (accept.
+    run 20261002-200007) - 18 % of the time at v_max, 52 % below 2 m/s, about 190 set-point stops (122 at path
+    changes, 53 inside paths, 12 after bumps), 924 s lost against flying the same distance at 4 m/s. First probe -
+    a_max 3 m/s^2 and turn rate 90 deg/s (tracking error at most 1.0 m, no new bumps).
+  blocks:
+  - SYS-P-002
+  owner: I5
+  status: closed
+  answer: '4 m/s^2 and 120 deg/s (D-41): no bump, tracking <= 0.61 m, distance flown 3855 -> 5149 m; partial approach (D-42, level only, no return to earlier approach points).'
+  evidence: evidence/E-41.md
+- id: Q-33
+  kind: customer_question
+  text: 'Change to the approved outdoor-zone rule (ITEM-D-046, Q-29). In one run the UAV saw open sky through the tall
+    cave mouth itself; the rule then ruled out the whole start of the cave, and the mission gave up after 1 min. New
+    form - spots within 20 m of where open sky was seen are tried only after every other spot, instead of never. In
+    the valley run the UAV had cave spots left, so it would still have stayed inside. Approve?'
+  blocks:
+  - ITEM-D-046
+  owner: I5
+  status: closed
+  answer: Customer approves the ITEM-D-046 change (zone goals last, not excluded).
+  evidence: null
+- id: E-41
+  kind: experiment
+  text: Does a 35 m depth range for the navigation map (was 20 m) cut the time spent in the wide first gallery (up to
+    the whole run in 20261003-005719, 0 lanterns in 26 min, 10-15 min in other runs), with planning and mapping
+    still in time and no new bump?
+  blocks:
+  - SYS-P-002
+  owner: I5
+  status: closed
+  answer: 'Yes: with the 35 m map (D-44) two runs reported all four lanterns (1136 s and 1893 s), never before; map consistency unchanged (0.0-0.2 %). Return along the track (D-43): 700 m in 247 s.'
+  evidence: evidence/E-41.md
+- id: Q-34
+  kind: customer_question
+  text: 'Change to two approved safety rules (ITEM-D-046, ITEM-D-048), after the run you stopped. With "near open sky
+    = tried last" (Q-33) the UAV left the cave through the south side of the first gallery, 15-21 m inside the
+    entrance. New form - (1) spots within 20 m of where open sky was seen are never chosen again, but only sightings
+    made after the UAV has been 50 m inside count (so the sky seen through the mouth at the start cannot stop the
+    mission); (2) once 50 m inside, the UAV never chooses a spot less than 25 m inside the entrance (was 15 m).
+    Replayed on 17 runs this blocks both valley exits and only a few spots near the gallery start in normal runs.
+    Approve?'
+  blocks:
+  - ITEM-D-046
+  - ITEM-D-048
+  owner: I5
+  status: closed
+  answer: Customer approves both changes (zone from views after 50 m in, excluding; mouth band 25 m).
+  evidence: null
+- id: Q-35
+  kind: customer_question
+  text: 'One more gap in the open-sky rule (ITEM-D-046), found right away in the next run, which I stopped after
+    80 s. At the very start, before being 50 m inside, the UAV flew from the mouth south into the valley opening,
+    and the sky it saw there did not count yet. Addition - a sighting also counts when it is at least 25 m from the
+    entrance point (the valley opening is 45-50 m from it; the sightings inside the tall mouth that once stopped a
+    run are 10-15 m from it). Approve?'
+  blocks:
+  - ITEM-D-046
+  owner: I5
+  status: closed
+  answer: Customer approves (a view 25 m or more from the entrance point counts).
+  evidence: null
+- id: E-43
+  kind: experiment
+  text: With goals beside track flown long ago (30 track points, about 60 m) ranked 60 m farther, does the UAV push on
+    to new ground (the descent to the last lantern) instead of chasing scraps beside its own track (acceptance series 3
+    run 1, 20261003-045522 - 15 min back along the tunnel after Lantern (1); fourth lantern at 1802 s)?
+  blocks:
+  - SYS-P-002
+  owner: I5
+  status: closed
+  answer: 'Not adopted (default off). Run 20261003-053936 (zone 30): after Lantern (1) the UAV again went back east along the tunnel for 12 min; flying back beside the old track lays new track beside it, so the scraps never count as passed.'
+  evidence: evidence/E-41.md
+- id: Q-36
+  kind: customer_question
+  text: 'The open-sky zone (ITEM-D-046) is too small. In the next run, which I stopped after 90 s, the UAV picked goals
+    20-25 m ahead of where it last saw sky, just outside the 20 m zone, and walked into the valley one goal at a time.
+    New radius - 30 m. Replayed on 20 runs it would have blocked 126 of 136 valley goals in the worst run (20 m - 110)
+    and costs 0-6 cave spots per normal run (20 m - 0-2). Approve?'
+  blocks:
+  - ITEM-D-046
+  owner: I5
+  status: closed
+  answer: Customer approves the 30 m zone.
+  evidence: null
+- id: Q-37
+  kind: customer_question
+  text: 'Safety change (ITEM-D-051). Twice the UAV passed 0.47 m from rock (no contact) because its planning map had
+    lost a small surface - later camera rays passing through the same 0.5 m cell erased it. New rule - anything the
+    camera has seen within 10 m stays an obstacle for the rest of the mission (except where the UAV itself is).
+    Approve?'
+  blocks:
+  - ITEM-D-051
+  owner: I5
+  status: closed
+  answer: Customer approves ITEM-D-051 (close sightings stay obstacles).
+  evidence: null
+- id: Q-38
+  kind: customer_question
+  text: 'Lantern reporting change (ITEM-D-028). Flying 3.4 m from the deepest lantern, the camera saw it against the
+    wall 14 m behind; that sighting landed 11 m from the lantern and was reported as a fifth lantern, so the mission
+    turned home thinking it had all four. New rule - sightings within 15 m of a lantern belong to it (was 8 m); the
+    lanterns are at least 100 m apart. Approve?'
+  blocks:
+  - ITEM-D-028
+  owner: I5
+  status: closed
+  answer: Customer approves the 15 m lantern merge radius.
+  evidence: null
+- id: Q-39
+  kind: customer_question
+  text: 'Exploration ranking change (ITEM-D-031, your Q-24 choice - descents count as level flight). With descents
+    counting half (going down is cheaper than level flight), the UAV took the descent to the deepest lantern at 12.5
+    min in its first test run; in the three runs before it went back along tunnels first and found that lantern at
+    30-34 min, too late. One run only - I would confirm it in the acceptance runs. Approve?'
+  blocks:
+  - ITEM-D-031
+  owner: I5
+  status: closed
+  answer: Customer approves descents counting half (descent weight 0.5), to be confirmed in the acceptance runs.
+  evidence: null
+- id: E-45
+  kind: experiment
+  text: With goals within 40 m of a reported lantern ranked 100 m farther, does the UAV stop lingering by found lanterns
+    (8 min around the deepest lantern in acceptance series 4 run 1, 20261003-065535; 7 min near Lantern (2) in E-36
+    run 2) and reach all four lanterns and the entrance within 1800 s more often?
+  blocks:
+  - SYS-P-002
+  owner: I5
+  status: closed
+  answer: 'Not adopted (default off). Run 20261003-073816: the 40 m zone around Lantern (3) also covered the passage onward; the UAV went back to the first gallery for 8 min after it. Lanterns lie in passages, so a penalty around them pushes the UAV off the way onward.'
+  evidence: evidence/E-41.md
+- id: E-46
+  kind: experiment
+  text: Why do close passes (0.46-0.47 m from a cave-map surface, no contact) still occur with D-45? Run
+    20261003-065535 at 1412 s - a path planned with 2 m clearance through known-free cells was blocked by a newly mapped
+    obstacle at 1400 s and the UAV braked to rest 0.46 m from it; the cell had been free in the map (cleared by rays,
+    or never hit before). Also 18 cave-map points within 1 m of the entrance point in that run only (shutdown pose?).
+    Tried (run 20261003-120806, stopped at 365 s) - far cells hit 3 times kept occupied (sticky_hits 3, default off) -
+    planning slowed to 7-11 s per request and, after a blocked path at 338 s, every plan failed in 0.3 s (the UAV
+    hemmed in by kept cells); the map can no longer correct wrong wall cells. Not adopted; other causes open.
+    Run 2 (20261003-125758, widest-clearance partials) - boxed in by kept close hits at the hook, failed at 673 s
+    (fixed, D-45 amended). Run 3 (20261003-131633) - held by the mouth while candidates ran out of budget, failed
+    at 874 s (fixed, D-48). Run 4 (20261003-134059) - 4 lanterns at 1911 s, return cut by the 40 min limit 230 m
+    from the entrance; 6 releases of kept close hits, no bump within 10 m after any; 6 bumps in all (4 on the
+    return). Lost time - after L1 a loop east to the hook and 240 s of leftover pockets there before the descent.
+    Run 5 (20261003-143243) - no bumps; L3, L2, L1 by 823 s; 12 releases of kept close hits; from 1880 s held by
+    the western junction, paths to the same goals blocked again and again in a tight passage (fixed, D-49); the deep
+    lantern was not reached within the 40 min limit.
+    Run 6 (20261003-152153) - failed at 233 s, shut in by kept hits near the gallery floor with every goal an
+    enclosed start (fixed, release also on an all-enclosed request).
+    Run 7 (20261003-153251) - no bumps, 3 releases; L3 204 s, L1 909 s, deep lantern 1183 s; L2 never reached (north
+    tunnel taken at the hook, the south branch never visited in 2400 s); one close pass, 0.47 m from a real wall seen
+    late in a passage about 1 m wide at ⟨x, y, z⟩, 1909 s, braking stop, no release nearby.
+    Run 8 (20261003-164224, D-50 in) - L3 212 s, then 1400 s back through the first gallery (34 % of exploring time on
+    goals within 10 m of track older than 2 min); L2 1883 s, L1 2282 s; close passes at the gallery roof (z 28, 1600 s)
+    and in the south branch (1975 s). Customer decision 2026-10-03 - redesign exploration (branch-aware order).
+  blocks:
+  - SYS-S-001
+  owner: I5
+  status: closed
+  answer: Resolved. Kept close hits (D-45) retired (Q-42) after they boxed the UAV in; the remaining close passes were
+    at depth-noise points that came with 120 deg/s turns (D-52, back to 60 deg/s). Acceptance series 3
+    (evidence/I5-acceptance-3.md) - no close pass at a real surface in three runs; one run failed on non-surface points
+    by the mouth (the drifting non-colliding object).
+  evidence: null
+- id: E-47
+  kind: experiment
+  text: Bumps without contact. None of 12 bumps in runs 20261002-221730 to 20261003-134059 had a reference cave
+    surface within 2 m of the UAV. Five came from a path queued during a brake starting at a stale estimate (fixed,
+    the estimate is now taken when the brake ends); one from overshoot ahead of a braking set-point; six from the UAV
+    0.3-0.55 m behind the set-point while accelerating (up to 4 m/s, a_max 4). Which acceleration limit, or which
+    bump criterion, keeps clean flight below the 0.5 m threshold while real contacts (0.66-0.85 m, E-19 (not published)) still count?
+  blocks:
+  - SYS-S-001
+  owner: I5
+  status: closed
+  answer: The remaining contact-free bumps and the close passes at depth-noise points came with the 120 deg/s turn rate
+    (D-41) - noise points near the track in 10 of 11 runs after it, 0-2 before, 0 at 60 deg/s (run 20261003-231614,
+    every sim test passed). Turn rate back to 60 deg/s (D-52); queued-path start fixed earlier.
+  evidence: null
+- id: Q-40
+  kind: customer_question
+  text: 'Safety rule change (ITEM-D-051). Surfaces seen up close are kept as obstacles for the whole mission. In one
+    run, a few false depth returns 1-2 m from the UAV were kept this way, boxed it in, and it hovered until the mission
+    failed. Proposed - when the UAV finds itself boxed in, it forgets the kept points within 5 m that its camera has
+    since seen to be empty space, and plans again. Real walls still seen as walls and bump marks stay. Approve?'
+  blocks:
+  - ITEM-D-051
+  owner: I5
+  status: closed
+  answer: Customer approves releasing kept close returns within 5 m that are since seen free, when the UAV is boxed in.
+  evidence: null
+- id: Q-41
+  kind: customer_question
+  text: 'Outdoor rules (ITEM-D-035, -044, -046) also fire deep in the cave, where tall chambers look like open sky -
+    at the end of recent runs they had ruled out the spots of Lantern 1 (2 of 3 runs), Lantern 2 (2 of 3), the deepest
+    lantern (1 of 3) and parts of the descent. In 120 runs the UAV was never outdoors more than 234 m past the
+    entrance. Proposed - apply these rules only to goals less than 300 m past the entrance. Approve?'
+  blocks:
+  - ITEM-D-035
+  - ITEM-D-044
+  - ITEM-D-046
+  owner: I5
+  status: closed
+  answer: Customer approves applying the outdoor rules only to goals less than 300 m past the entrance plane.
+  evidence: null
+- id: E-48
+  kind: experiment
+  text: With the opening tier (D-51, --opening-tier true), do three runs find more lanterns (runs 4-8 averaged 2.6),
+    reach the fourth sooner and spend less exploring time beside old track (goal_novelty.py) without a new safety-test
+    failure?
+    Run 1 (20261003-174110) - L3 281 s, L2 657 s, deepest lantern 1248 s, L1 never; 43 % of exploring time beside old
+    track (runs 4-8 26-56 %); explore requests median 2.8 s (was 1.4 s); close pass and pace tests failed. The tier
+    chose openings 60+ times until 1250 s, then found none and the UAV took scraps in the deep chamber for 1000 s.
+    The narrow tunnels towards L1 are never openings - their end faces are a few dozen frontier cells and every cell
+    lies within 2 m of a wall (openings.cpp on the run's map, open_m 2.0 and 1.0). Detector to be reworked before
+    runs 2-3.
+    Run 2 (20261003-185202, revision 2) - all four lanterns (L3 178 s, L2 322 s, L1 616 s, deepest 1480 s) and back at
+    the entrance at 1931 s (mission complete, 131 s over 1800 s); 31 % of exploring time beside old track; explore
+    requests median 1.5 s; no bump, one release, all safety tests passed; map coverage 88.7 % (90 % required). Lost
+    time - after L1 the nearest openings led east along the L1-hook passage and into first-gallery pockets (960-1080 s)
+    before the descent beside the western junction.
+  blocks:
+  - SYS-P-002
+  owner: I5
+  status: closed
+  answer: Adopted (D-51 revision 2, default on, ITEM-D-052). Run 1 (window detector) 3 lanterns; runs 2 and 3 (per-bin
+    rule) all four lanterns and back at the entrance in 1931 s and 1651 s, 31 % and 7 % of exploring time beside old
+    track (runs 4-8 26-56 %); run 3 passed every sim test.
+  evidence: null
+- id: E-50
+  kind: experiment
+  text: Without kept close hits (D-45 off, --sticky-range 0), does the UAV stop being boxed in (E-46 runs 2 and 6 and
+    acceptance series 1 run 3 failed that way; 3-12 releases per run) without more close passes at real surfaces than
+    with them (runs since D-45 - one real-wall close pass, E-46 run 7; the others were depth-noise points)?
+    Run 1 (20261003-220107, sticky off) - all four lanterns by 1135 s, back at the entrance at 1527 s (fastest yet);
+    no hold, no bump, map coverage 92.6 %; 11/12 sim tests - the surface criterion failed on 17 depth-noise points
+    (no reference surface within 2 m) passed at 0.31 m at 988 s. Run 2 (20261003-223701) - complete at 1922 s,
+    no stall; one close pass at depth-noise points; coverage 87.9 %.
+  blocks:
+  - SYS-S-001
+  - SYS-P-005
+  owner: I5
+  status: closed
+  answer: Kept close hits removed (Q-42). Runs 20261003-220107 and -223701 without them - no stall, missions complete
+    in 1527 s and 1922 s; the only close passes (as in all four since 20261003-204832) were at depth-noise points with
+    no reference surface within 1 m (tools/probes/close_passes.py).
+  evidence: null
+- id: Q-42
+  kind: customer_question
+  text: 'Safety rule ITEM-D-051 (depth returns within 10 m kept as obstacles all mission) boxed the UAV in until the
+    mission failed in 3 runs despite the Q-40 release. In 2 runs without it - no stall, missions completed, no close
+    pass at a real surface (all close passes at stray depth points). Proposed - remove the rule. Approve?'
+  blocks:
+  - ITEM-D-051
+  owner: I5
+  status: closed
+  answer: Customer approves removing the kept-close-returns rule (ITEM-D-051 retired, sticky_range off by default).
+  evidence: null
+- id: Q-43
+  kind: customer_question
+  text: 'I5 sign-off of the CRIT-A requirements SYS-P-002, SYS-P-005, ITEM-D-046, ITEM-D-047 and ITEM-D-048 after
+    acceptance series 3 (evidence/I5-acceptance-3.md, 2 of 3 runs met all five criteria); changes reviewed by the
+    developer only, not by a separate reviewer.'
+  blocks:
+  - SYS-P-002
+  - SYS-P-005
+  - ITEM-D-046
+  - ITEM-D-047
+  - ITEM-D-048
+  owner: I5
+  status: closed
+  answer: Customer approves marking them implemented (2026-10-04).
+  evidence: null
+- id: E-51
+  kind: experiment
+  text: Is the periodic "stall" of E-38 (simulator header stamps stepping back 0.7-1.0 s every 31-33 s; false bumps,
+    tracking errors and failed depth insertions in runs 20261004-131016 and -134102, none in acceptance series 3) the
+    WSL clock being stepped by systemd-timesyncd? Fact so far - timesyncd polls every 32 s and measured -770 ms right
+    after a WSL boot (2026-10-04 13:56); WSL also syncs its clock with the Windows host. Test - a run with timesyncd
+    disabled in WSL shows no stamp rewinds.
+  blocks:
+  - SYS-P-005
+  owner: I5
+  status: closed
+  answer: Yes. With systemd-timesyncd disabled in WSL (customer, 2026-10-04) the injected-lantern run 20261004-143040
+    had no stamp rewind, no bump and passed 27 of 27 applicable sim tests (the run before it, -134102, 9 rewinds and
+    3 failures). E-38's "host stall" was this clock stepping. README notes it for WSL users.
+  evidence: null
+- id: Q-44
+  kind: customer_question
+  text: 'Final-validation run 20261004-143626 walked out of the mouth into the valley goal by goal, each new goal just
+    beyond the 30 m zone of the latest outdoor view. Proposed safety rule ITEM-D-053 - while the UAV is inside that zone
+    (and less than 300 m in), it picks the goals nearest the entrance first. Approve?'
+  blocks:
+  - ITEM-D-053
+  owner: I5
+  status: closed
+  answer: Customer approves ITEM-D-053 (homing from outdoors), to be confirmed in fresh sim runs.
+  evidence: null
+- id: Q-45
+  kind: customer_question
+  text: 'Run 20261004-151458 waited in WAIT_SENSORS until the time cap after the simulator bridge died at start-up;
+    the failure rules start at take-off (SYS-F-016). Should a run whose sensors never arrive be declared failed?'
+  blocks:
+  - SYS-F-029
+  owner: I5
+  status: closed
+  answer: Customer - 'Yeah, implement the rule' (SYS-F-029, ITEM-D-054; 120 s as SYS-F-016).
+  evidence: null
+- id: Q-46
+  kind: customer_question
+  text: 'The 0.5 m surface check of SYS-S-001 fails about 1 run in 4 on a small non-colliding object the depth camera
+    sees drifting across the route by the mouth (21 mapped points, nothing attached, passed at 0.37 m, no contact).
+    Should the check leave out small detached clusters? (Customer asked whether a pointy object such as a stalactite
+    could be hidden - no - clusters attached to a wall, ceiling or terrain always count, and contact stays judged by
+    the tracking and bump checks.)'
+  blocks:
+  - SYS-S-001
+  owner: I5
+  status: closed
+  answer: Customer approves leaving out mapped clusters of at most 30 cells linked within 0.5 m (tools/sim_tests/surface_rule.py);
+    the I4 valley run 20261002-192153 still fails the check, the two mouth-object runs pass.
+  evidence: null

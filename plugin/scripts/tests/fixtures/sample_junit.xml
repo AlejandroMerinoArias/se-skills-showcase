@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="demo" tests="2" failures="1">
+  <testcase classname="tests.test_hover" name="test_hover_command_latency_under_obstacle" time="0.01"/>
+  <testcase classname="tests.test_hover" name="test_slow_case" time="0.02">
+    <failure message="assertion failed">AssertionError</failure>
+  </testcase>
+</testsuite>

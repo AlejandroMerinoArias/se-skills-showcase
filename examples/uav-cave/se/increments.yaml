@@ -1,0 +1,101 @@
+increments:
+- id: I0
+  goal: 'Characterization: answer E-01..E-09 by reading code and running the provided simulation in WSL.'
+  status: verified
+  requirements: []
+  exit_evidence: evidence/I0-exit.md
+- id: I1
+  goal: 'Walking skeleton: one launch file starts sim + stack; UAV takes off on the estimated pose, flies predefined
+    waypoints to the cave entrance, reports the entrance instant, builds and saves a voxel map and a (possibly empty)
+    lantern file.'
+  status: verified
+  requirements:
+  - SYS-F-001
+  - SYS-F-002
+  - SYS-F-003
+  - SYS-F-007
+  - SYS-F-008
+  - SYS-F-009
+  - SYS-F-011
+  - SYS-F-014
+  - SYS-F-015
+  - SYS-P-003
+  - SYS-I-002
+  - SYS-C-001
+  - SYS-C-003
+  - SYS-C-004
+  - SYS-C-005
+  - SYS-S-002
+  exit_evidence: evidence/I1-exit.md
+- id: I2
+  goal: Autonomous exploration inside the cave with collision-free path and trajectory planning, and return to the
+    entrance.
+  status: verified
+  requirements:
+  - SYS-C-002
+  - SYS-C-009
+  - SYS-F-006
+  - SYS-S-003
+  - SYS-F-016
+  - SYS-F-017
+  - SYS-F-018
+  - SYS-F-019
+  - SYS-F-020
+  - SYS-F-021
+  exit_evidence: evidence/I2-exit.md
+  moved_out:
+  - SYS-S-001 to I3 after E-19 (not published) (contact on a long exploration)
+- id: I3
+  goal: Lantern detection, localisation within 2 m, de-duplication, publishing and lantern-file output.
+  status: verified
+  requirements:
+  - SYS-F-004
+  - SYS-F-005
+  - SYS-F-013
+  - SYS-F-010
+  - SYS-I-001
+  - SYS-P-001
+  - SYS-S-004
+  exit_evidence: evidence/I3-exit.md
+  moved_out:
+  - SYS-S-001 to I5 after I4 acceptance run 20261002-192153 (within 0.5 m of valley terrain)
+- id: I4
+  goal: 'Full-mission performance and delivery: 30-min mission, map-quality judgement, 2-of-3 acceptance runs, README
+    and documentation.'
+  status: failed
+  failure_cause: 'SYS-P-005 not met in two acceptance series (evidence/I4-acceptance.md, I4-acceptance-2.md): no run
+    reported Lantern (2) and returned within 1800 s, and run 20261002-192153 spent its exploration in the outdoor
+    valley and came within 0.5 m of valley terrain. Customer chose to plan I5 for these gaps (2026-10-02).'
+  exit_evidence: evidence/I4-acceptance-2.md
+  moved_out:
+  - SYS-P-002, SYS-P-004, SYS-P-005 to I5 after the second acceptance series
+  requirements:
+  - SYS-C-006
+  - SYS-C-007
+  - SYS-C-008
+  - SYS-C-010
+  - SYS-F-022
+  - SYS-F-023
+  - SYS-F-024
+  - SYS-F-025
+  - SYS-F-026
+  - SYS-F-027
+  - SYS-F-028
+  - SYS-P-006
+- id: I5
+  goal: 'Mission completion and safety: keep the UAV inside the cave (no outdoor-valley exploration), reach every
+    lantern including Lantern (2) and return within 1800 s, recover from bumps without repeated contact, then a new
+    2-of-3 acceptance series.'
+  status: verified
+  requirements:
+  - SYS-P-002
+  - SYS-P-004
+  - SYS-P-005
+  - SYS-S-001
+  - SYS-F-029
+  exit_evidence: evidence/I5-exit.md
+final_validation:
+  date: '2026-10-05'
+  result: all six CONOPS use cases demonstrated (final runs 20261005-164436 nominal, -163833 injected lanterns,
+    -163355 stall); strict gate clean on build_results/final_junit.xml (353 test cases, 0 failures); no open items
+  evidence: evidence/final-validation.md
