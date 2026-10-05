@@ -1,4 +1,4 @@
-"""BLOAT checks (v2 design spec section 6.4). v1's artifacts grew to 1.5 MB and
+"""BLOAT checks (v2 design spec section 6.4). v1's artifacts grew to 1.8 MB and
 every cold agent paid to read them; these WARNINGs make growth visible early."""
 
 from __future__ import annotations

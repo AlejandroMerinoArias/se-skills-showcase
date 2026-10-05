@@ -18,7 +18,7 @@ Requires Python 3.11+.
 
 ## Skills
 
-The pipeline lives under `skills/`: eight skills, about 5,300 words in total (v1: ten skills, 30,746). Each one states its own
+The pipeline lives under `skills/`: eight skills, about 5,800 words in total (v1: ten skills, 30,746). Each one states its own
 triggering conditions in its frontmatter; the one-liners below are a map, not the trigger.
 
 `se:develop` is the entry point: it does no phase work itself. It runs `se_check.py --route`
