@@ -74,7 +74,7 @@ straight segments.
 Alternatives: a mouth point at y ⟨…⟩ (blocked: the UAV hit rock at x ⟨…⟩, flight e03_f1); a point deeper
 in the gallery (it is no longer "at the mouth" as the brief asks).
 Why: E sits in the rock arch that opens into the gallery. The route was flown 9 times (3 runs × 3) with 0.00 m
-arrival error and no contact (evidence/E-03.md), and the gallery beyond was flown to x = -450.
+arrival error and no contact (evidence/E-03.md), and the gallery beyond was flown to x ⟨…⟩.
 Reverses if: a mission run shows contact on the approach, or the mapping shows E outside the cave opening.
 
 ## I1 — Walking skeleton: launch, approach, entrance event, map, output files

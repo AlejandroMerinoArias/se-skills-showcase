@@ -91,7 +91,7 @@ items:
   status: closed
   answer: 'Yes: scene-file positions (UnityPy) match the sim within 0.45 m horizontally; scene origin is 1.7 m below
     the visible lantern base (lantern about 4.5 m tall), see Q-06.'
-  evidence: evidence/E-05 (not published).md
+  evidence: evidence/E-05.md (not published)
 - id: E-06
   kind: experiment
   text: Can reference cave geometry be obtained (scene data in Simulation_Data, or a truth-pose mapping run used
@@ -170,7 +170,7 @@ items:
   status: closed
   answer: "Visible centre = scene origin + ⟨x, y, z⟩ m (\xB10.1 m in z; 2 lanterns x 3 runs; one prefab transform\
     \ for all five): the scoring truth for SYS-P-001."
-  evidence: evidence/E-10 (not published).md
+  evidence: evidence/E-10.md (not published)
 - id: E-11
   kind: experiment
   text: Does the presence of /dev/dxg distinguish a WSL2 host with GPU passthrough from a native Ubuntu host (where
@@ -405,7 +405,7 @@ items:
   answer: 'No: in a 9.7 min run the explorer climbed to z 51.8 m (37 m above E), above the terrain over the cave
     mesh whose back faces the camera cannot see, and touched the surface; all incidents were more than 20 m above
     E, no goal at or below 33 m had one.'
-  evidence: evidence/E-19 (not published).md
+  evidence: evidence/E-19.md (not published)
 - id: Q-17
   kind: customer_question
   text: 'A 10-minute exploration run touched the cave (SYS-S-001 violated): the UAV climbed 37 m above the entrance,
@@ -419,7 +419,7 @@ items:
   status: closed
   answer: 'Customer rejects a fixed ceiling and approves the revised ITEM-D-031: only camera-revealable (horizontal)
     frontiers, vertical travel weighted 3x.'
-  evidence: evidence/E-19 (not published).md
+  evidence: evidence/E-19.md (not published)
 - id: Q-18
   kind: customer_question
   text: 'Contact with simulator surfaces that are invisible from one side (1 of 5 long runs): (A) build bump detection,
@@ -431,7 +431,7 @@ items:
   owner: I3
   status: closed
   answer: Customer chose A (then decide on the measured contact rate).
-  evidence: evidence/E-19 (not published).md
+  evidence: evidence/E-19.md (not published)
 - id: Q-19
   kind: customer_question
   text: How should SYS-S-001 be judged given simulator objects the depth camera cannot see; and do you approve the
@@ -444,7 +444,7 @@ items:
   status: closed
   answer: 'Visible surfaces only: no contact with surfaces the camera can see; brief contact with invisible objects
     is acceptable if the UAV recovers and continues (SYS-S-004). Both deviations approved.'
-  evidence: evidence/E-19 (not published).md
+  evidence: evidence/E-19.md (not published)
 - id: Q-20
   kind: customer_question
   text: Do you approve the I3 implementation of its CRIT-A requirements?
