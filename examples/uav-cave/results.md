@@ -47,7 +47,7 @@ A fourth, independent set of runs on the delivered build, after the acceptance s
 | Requirements, system level (SYS-) | 51 | [se/requirements.yaml](se/requirements.yaml) | `grep -c "^- id: SYS-" se/requirements.yaml` |
 | Requirements, item level (ITEM-) | 54 | [se/requirements.yaml](se/requirements.yaml) | `grep -c "^- id: ITEM-" se/requirements.yaml` |
 | Requirements by criticality A / B / C | 50 / 45 / 10 | [se/requirements.yaml](se/requirements.yaml) | `grep -c "criticality: A" se/requirements.yaml` (and B, C) |
-| Requirements by status | 94 verified, 8 implemented, 3 retired | [se/requirements.yaml](se/requirements.yaml) | `grep -c "status: verified" se/requirements.yaml` (and implemented, retired) |
+| Requirements by status | 94 verified, 8 implemented, 3 retired (the 8 implemented are the 8 `NESTED` parents in [generated/matrix.md](se/generated/matrix.md), carried by their verified children) | [se/requirements.yaml](se/requirements.yaml) | `grep -c "status: verified" se/requirements.yaml` (and implemented, retired) |
 | Open items, total | 93 | [se/open-items.yaml](se/open-items.yaml) | `grep -c "^- id:" se/open-items.yaml` |
 | Open items by kind | 47 experiments, 45 customer questions, 1 design decision | [se/open-items.yaml](se/open-items.yaml) | `grep -c "kind: experiment" se/open-items.yaml` (and customer_question, design_decision) |
 | Open items by status | 93 closed, 0 open | [se/open-items.yaml](se/open-items.yaml) | `grep -c "status: closed" se/open-items.yaml` |

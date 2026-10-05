@@ -31,7 +31,8 @@ Read `se/` in this order:
 6. **[evidence/](se/evidence/)** — the write-ups behind the experiments and the increment
    inspections and acceptance runs that `open-items.yaml` and `requirements.yaml` point to:
    question, command, raw results, verdict, limits. Only a selection is published; evidence that
-   would give away the course challenge's answers is marked "(not published)" where it is cited.
+   would give away the course challenge's answers is marked "(not published)" where it is cited. Other evidence files
+   cited in the artifacts (e.g. `evidence/E-03.md`) are outside the published selection.
 7. **[generated/matrix.md](se/generated/matrix.md)** — the full requirement-to-verification matrix,
    generated from `requirements.yaml`: every requirement with its increment, criticality, method
    and result (`PASS`, `EVIDENCE`, `NESTED`, or `UNVERIFIED` for two retired requirements). This is

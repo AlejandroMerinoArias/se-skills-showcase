@@ -30,7 +30,7 @@ parts that matter here are standard material in any systems-engineering course:
   with an identifier, written to the quality criteria of INCOSE (the International Council on Systems
   Engineering): necessary, unambiguous, verifiable, singular, and so on. Here it is also written in
   EARS form (Easy Approach to Requirements Syntax), a small set of sentence templates such as
-  "When ..., the system shall ...". Each one also
+  "When ..., the system shall ...". Each one
   carries a criticality level that sets how much review it gets.
 - **Verification methods.** Every requirement states how it will be shown to be met: test,
   analysis, inspection or demonstration. "Done" then has a definition other than "the code runs".
@@ -38,7 +38,7 @@ parts that matter here are standard material in any systems-engineering course:
   every leaf points to the test or evidence that verifies it. A generated matrix shows, for each
   requirement, whether that evidence passed.
 - **Change control.** When a requirement changes, everything downstream of it (child requirements,
-  design decisions, tests) is marked suspect and re-examined, and only that subtree is re-examined.
+  design decisions, tests) is marked suspect and re-examined; nothing outside that subtree is.
 - **The V-model.** Decomposition on the left side (needs, system requirements, design), integration
   and verification on the right side, with each level of the right verifying the matching level of
   the left.

@@ -81,8 +81,8 @@ touched the cave, the pipeline proposed a hard limit on height. He rejected it
 > 'Customer rejects a fixed ceiling and approves the revised ITEM-D-031: only camera-revealable
 > (horizontal) frontiers, vertical travel weighted 3x.'
 
-**A live mission visualization.** He asked for a simple live view of the mission, which became six
-system requirements, a demonstration
+**A live mission visualization.** He asked for a simple live view of the mission, which became eight
+system requirements (SYS-F-022 to SYS-F-028 and SYS-P-006), a demonstration
 ([evidence/I4-view-demo.md](../examples/uav-cave/se/evidence/I4-view-demo.md)) and the figure in
 [figures/mission-view.png](../examples/uav-cave/figures/mission-view.png). The request as recorded
 ([requirements.yaml](../examples/uav-cave/se/requirements.yaml#L2024)):

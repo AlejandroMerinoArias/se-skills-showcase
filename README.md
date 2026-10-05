@@ -4,6 +4,8 @@
 
 > **Status:** experimental proof of concept, in active development, not a supported tool.
 
+Designed by Alejandro Merino Arias; implemented with Claude Code under his direction.
+
 ## The problem
 
 AI coding agents on long engineering projects tend either to specify everything on day one and
@@ -23,7 +25,7 @@ More in [docs/motivation.md](docs/motivation.md) and [docs/v1-lesson.md](docs/v1
   design decision, and it is tracked until closed.
 - **Experiments first.** Anything the system or the simulator can answer is measured, not asked.
   The customer is asked only what only the customer can decide.
-- **Scripts keep it honest.** [Eight Claude Code skills](examples/uav-cave/results.md#v1-for-contrast) guide the agent; Python scripts check the
+- **Scripts keep it honest.** [Eight Claude Code skills](plugin/skills/) guide the agent; Python scripts check the
   artifacts and compute where the project stands, so any session can resume from the files.
 
 ```mermaid
@@ -55,17 +57,19 @@ session. All figures below come from [results.md](examples/uav-cave/results.md).
 | Duration | 2026-09-28 to 2026-10-05, one session; [42.2 active hours](examples/uav-cave/results.md#cost) |
 | Increments | [6, of which 5 verified; 1 failed and was re-planned into the next](examples/uav-cave/results.md#process) |
 | Requirements | [105 (51 system level, 54 item level)](examples/uav-cave/results.md#process) |
-| Open items | [93, all closed: 47 experiments, 45 customer questions, 1 design decision](examples/uav-cave/results.md#process) |
+| Open items | [93, all closed: 47 experiments, 45 customer questions, 1 design decision](examples/uav-cave/results.md#process) (51 further design decisions are recorded in [architecture.md](examples/uav-cave/se/architecture.md)) |
 | Defects, by how found | [72 fix commits: 56 in simulation, 10 in review, 6 other](examples/uav-cave/results.md#defects) |
-| Acceptance series | [2 of 3 runs met all five success criteria](examples/uav-cave/results.md#outcome--acceptance-series-3) |
-| Final validation | [nominal run back at the entrance at 1511 s with 92.9% map coverage; 353 test cases, 0 failures; 6 of 6 CONOPS use cases](examples/uav-cave/results.md#outcome--final-validation) |
+| Acceptance series | [2 of 3 runs met all five success criteria](examples/uav-cave/results.md#outcome--acceptance-series-3) (the customer's acceptance rule: 2 of 3) |
+| Final validation | [nominal run back at the entrance at 1511 s with 92.9% map coverage; 353 test cases, 0 failures; 6 of 6 concept-of-operations (CONOPS) use cases](examples/uav-cave/results.md#outcome--final-validation) |
 
 ![Live view near the end of a run: cave outline in grey, the four lanterns found in yellow, the UAV in red back at the entrance](examples/uav-cave/figures/mission-view.png)
 
 For contrast, v1 on the same mission ran
 [23 rounds, asked 41 customer questions and wrote no code](examples/uav-cave/results.md#v1-for-contrast).
 That failure is the lesson v2 is built on: questions an experiment can answer never go to the
-customer, and nothing is specified far ahead of what is being built.
+customer, and nothing is specified far ahead of what is being built. v2 still asked 45 customer
+questions, most of them approvals of criticality-A work, which is an open problem
+([details](docs/v1-lesson.md#what-changed-in-practice)).
 
 This is one case study with no baseline: there is no second run and no run without se-skills, so
 none of these numbers is a comparison.

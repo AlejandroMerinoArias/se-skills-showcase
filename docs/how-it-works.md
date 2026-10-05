@@ -158,7 +158,7 @@ The full matrix is [generated/matrix.md](../examples/uav-cave/se/generated/matri
 
 A changed requirement and its whole subtree are marked suspect by script, and the change is resolved
 at the design decision that caused it. ITEM-D-016's escape zone near a blocked start was widened
-after a stalled run; its rationale
+after a run ended in the no-movement failure; its rationale
 ([requirements.yaml](../examples/uav-cave/se/requirements.yaml#L1002)) names the decisions, the
 evidence and the customer approval:
 

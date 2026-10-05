@@ -1,7 +1,8 @@
 # Mission
 
 A simulated quadrotor takes off next to a reference lantern, in open ground, and flies a predefined
-waypoint route to a cave entrance I chose when I set the mission up. The instant it first reaches
+waypoint route to an entrance point at the cave mouth (the pipeline located it by experiment, E-03;
+see decision D-05 in [se/architecture.md](se/architecture.md)). The instant it first reaches
 that point starts a 30-minute clock: from there on, the UAV gets no outside help. It picks where to
 fly next from its own sensing alone — depth and stereo cameras, a semantic camera that marks the
 lanterns by colour, and a position estimate that the simulator deliberately corrupts with noise. The
@@ -18,7 +19,7 @@ simulator itself — the cave geometry, the lantern models, the way the position
 — is left exactly as given; nothing in the mission stack is allowed to touch it.
 
 The scenario is the Sub-Terrain Challenge of the Autonomous Systems course at the Technical
-University of Munich (winter semester 2025). The simulator, the ROS bridge and the controller are
+University of Munich (winter semester 2025/26). The simulator, the ROS bridge and the controller are
 the chair's and are not included.
 
 I had already solved this challenge once, with a team, as part of the course itself. For the run
